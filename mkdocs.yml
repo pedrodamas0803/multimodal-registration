@@ -1,0 +1,47 @@
+site_name: multimodal-registration
+site_description: 3-D multimodal image registration for DCT and PCT volumes
+repo_url: https://github.com/damasres/multimodal-registration
+
+theme:
+  name: readthedocs
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Theory:
+      - Image Registration: theory/registration.md
+      - Deformation & Rotations: theory/deformation.md
+      - Crystal Orientations & IPF: theory/crystallography.md
+  - User Guide:
+      - Full Pipeline: guide/workflow.md
+      - Interactive Registration: guide/interactive.md
+      - Exporting Data: guide/export.md
+      - GPU Acceleration: guide/gpu.md
+  - API Reference: api/reference.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            show_source: true
+            show_root_heading: true
+            heading_level: 2
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - attr_list
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - assets/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
