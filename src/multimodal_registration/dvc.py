@@ -66,7 +66,7 @@ class DVC:
     """
 
     _VTK_EXTENSIONS = {"vtk", "vts", "vtu", "vtr", "vtm"}
-    _H5_EXTENSIONS  = {"mat", "h5", "hdf5", "res§"}
+    _H5_EXTENSIONS  = {"mat", "h5", "hdf5", "res"}
 
     def __init__(
         self,
