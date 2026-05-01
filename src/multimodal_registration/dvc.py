@@ -412,6 +412,7 @@ class DVCMesh:
             self.n_gauss = 8
 
             self.params = _read_mat_params(f["param"]) if "param" in f else {}
+            self.model  = _read_mat_params(f["model"]) if "model" in f else {}
 
             # Resolve pixel size: explicit arg > param group > default 1
             if pixel_size is not None:
@@ -422,10 +423,12 @@ class DVCMesh:
                 self.pixel_size = 1.0
             self.unit = unit
 
-            # Expose every param field as a direct attribute so callers can
-            # write dvc.pixel_size, dvc.roi, dvc.analysis, etc.
+            # Expose every param/model field as a direct attribute.
             # Existing attributes (n_nodes, pixel_size, …) are never overwritten.
             for _k, _v in self.params.items():
+                if _k.isidentifier() and not hasattr(self, _k):
+                    setattr(self, _k, _v)
+            for _k, _v in self.model.items():
                 if _k.isidentifier() and not hasattr(self, _k):
                     setattr(self, _k, _v)
 
@@ -740,25 +743,27 @@ class DVCMesh:
             self.select_step(step)
         vals = self._strain_cell_data(component)           # (n_elems,)
 
-        centroids = self.nodes_phys[self.connectivity].mean(axis=1)  # (n_elems, 3)
-        cn = centroids[:, ni]
+        # Centroids in pixel units — pixel_size is applied only for display.
+        centroids_px = self.nodes[self.connectivity].mean(axis=1)  # (n_elems, 3)
+        cn = centroids_px[:, ni]
 
         if origin is None:
             origin = float(cn.mean())
         if thickness is None:
-            extent = float(cn.ptp())
+            extent_px = float(cn.ptp())
             n_layers = max(round(self.n_elems ** (1 / 3)), 1)
-            thickness = 1.5 * extent / n_layers
+            thickness = 1.5 * extent_px / n_layers
 
         mask = np.abs(cn - origin) <= thickness / 2
         if mask.sum() == 0:
             raise ValueError(
-                f"No elements within slice at {axis_names[ni]}={origin:.3g} {self.unit}"
+                f"No elements within slice at {axis_names[ni]}={origin:.3g} px"
                 f" ± {thickness/2:.3g}.  Increase thickness or adjust origin."
             )
 
-        x = centroids[mask, h0]
-        y = centroids[mask, h1]
+        px = self.pixel_size
+        x = centroids_px[mask, h0] * px   # physical units for display
+        y = centroids_px[mask, h1] * px
         z = vals[mask]
 
         if ax is None:
@@ -768,11 +773,11 @@ class DVCMesh:
 
         # --- PCT grayscale background ----------------------------------------
         if pct is not None:
-            px = self.pixel_size
             # DVC axis i → PCT axis (2 - i):  DVC x(0)→PCT 2, y(1)→1, z(2)→0
+            # origin is already in pixels — use directly as voxel index.
             pct_ni = 2 - ni
             slice_idx = int(np.clip(
-                round(origin / px), 0, pct.vol.shape[pct_ni] - 1
+                round(origin), 0, pct.vol.shape[pct_ni] - 1
             ))
             pct_slice = np.take(pct.vol, slice_idx, axis=pct_ni)  # 2D
 
@@ -808,7 +813,8 @@ class DVCMesh:
         ax.set_ylabel(f"{axis_names[h1]}{unit_label}")
         ax.set_title(
             f"Strain ({component})  |  "
-            f"{axis_names[ni]} = {origin:.3g}{unit_label}  |  step {self._step}"
+            f"{axis_names[ni]} = {origin * self.pixel_size:.3g}{unit_label}  |  "
+            f"step {self._step}"
         )
         ax.set_aspect("equal")
 
@@ -831,7 +837,7 @@ class DVCMesh:
         Parameters
         ----------
         coords : array-like ``(3,)`` or list of ``(3,)``
-            Physical coordinate(s) ``(x, y, z)`` to probe.  Each point is
+            Pixel coordinate(s) ``(x, y, z)`` to probe.  Each point is
             matched to the nearest element centroid at *ref_step*.
         component : str
             ``'xx'``, ``'yy'``, ``'zz'``, ``'xy'``, ``'xz'``, ``'yz'``
@@ -852,8 +858,8 @@ class DVCMesh:
         coords = np.atleast_2d(coords)          # (n_coords, 3)
         n_coords = len(coords)
 
-        ref_nodes_phys = (self._ref_nodes + self._U_all[ref_step]) * self.pixel_size
-        centroids = ref_nodes_phys[self.connectivity].mean(axis=1)
+        ref_nodes_px = self._ref_nodes + self._U_all[ref_step]   # pixel units
+        centroids = ref_nodes_px[self.connectivity].mean(axis=1)
         elem_indices = np.array([
             int(np.argmin(np.linalg.norm(centroids - c, axis=1)))
             for c in coords
