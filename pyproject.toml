@@ -14,7 +14,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# VTK file support for DVC results
+# VTK file I/O (DVC class) and 3-D mesh visualisation (DVCMesh.to_pyvista,
+# DVCMesh.plot_strain_field)
 vtk = ["pyvista>=0.43"]
 # Jupyter interactive registration UI
 jupyter = ["ipywidgets>=8.0", "ipympl>=0.9"]
@@ -24,6 +25,13 @@ crystal = ["orix>=0.12"]
 #   pip install "multimodal-registration[cuda12]"
 cuda11 = ["cupy-cuda11x>=12.0", "cucim-cu11>=23.0"]
 cuda12 = ["cupy-cuda12x>=12.0", "cucim-cu12>=23.0"]
+# Everything except GPU — convenient for a full CPU install
+all = [
+    "pyvista>=0.43",
+    "ipywidgets>=8.0",
+    "ipympl>=0.9",
+    "orix>=0.12",
+]
 
 [project.scripts]
 multimodal-registration = "multimodal_registration:main"
