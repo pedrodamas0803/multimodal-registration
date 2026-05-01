@@ -428,7 +428,11 @@ class DVCMesh:
             yo = np.array(f["yo"])
             zo = np.array(f["zo"])
 
+            # U stores mode amplitudes; Smesh is the mode-shape matrix.
+            # MATLAB: U [n_modes, n_steps], Smesh [3·n_nodes, n_modes]
+            # h5py (transposed): U (n_steps, n_modes), Smesh (n_modes, 3·n_nodes)
             U_raw = np.array(f["U"])
+            Smesh = np.array(f["Smesh"]) if "Smesh" in f else None
 
             # MATLAB stores conn as [n_elems, 8]; h5py reads it as (8, n_elems).
             # Convert to 0-based indexing for NumPy.
@@ -453,8 +457,18 @@ class DVCMesh:
         # Stack to (n_steps, n_nodes, 3)
         self._nodes_all = np.stack([xo, yo, zo], axis=-1)
 
-        # Reshape U to (n_steps, n_nodes, 3)
-        self._U_all = _reshape_U(U_raw, self.n_steps, self.n_nodes)
+        # Reconstruct physical DOFs from mode amplitudes when Smesh is present:
+        #   U_modes (n_steps, n_modes) @ Smesh (n_modes, 3·n_nodes)
+        #   → (n_steps, 3·n_nodes) → reshape (n_steps, n_nodes, 3)
+        # DOF ordering assumed interleaved: [ux0, uy0, uz0, ux1, uy1, uz1, …]
+        if Smesh is not None:
+            self.Smesh = Smesh                              # (n_modes, 3·n_nodes)
+            U_modes = _steps_first(U_raw, self.n_steps)    # (n_steps, n_modes)
+            U_phys  = U_modes @ Smesh                      # (n_steps, 3·n_nodes)
+            self._U_all = U_phys.reshape(self.n_steps, self.n_nodes, 3)
+        else:
+            self.Smesh = None
+            self._U_all = _reshape_U(U_raw, self.n_steps, self.n_nodes)
 
         # Activate requested step
         idx = step if step >= 0 else self.n_steps + step
