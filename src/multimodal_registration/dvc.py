@@ -422,6 +422,13 @@ class DVCMesh:
                 self.pixel_size = 1.0
             self.unit = unit
 
+            # Expose every param field as a direct attribute so callers can
+            # write dvc.pixel_size, dvc.roi, dvc.analysis, etc.
+            # Existing attributes (n_nodes, pixel_size, …) are never overwritten.
+            for _k, _v in self.params.items():
+                if _k.isidentifier() and not hasattr(self, _k):
+                    setattr(self, _k, _v)
+
             # xo/yo/zo hold the reference (undeformed) nodal coordinates.
             # Shape in file: (1, n_nodes) — squeeze to (n_nodes,).
             xo_ref = np.array(f["xo"]).ravel()
@@ -670,8 +677,10 @@ class DVCMesh:
         origin: float | None = None,
         thickness: float | None = None,
         step: int | None = None,
-        cmap: str = "RdBu_r",
+        cmap: str = "jet",
         ax=None,
+        pct=None,
+        pct_alpha: float = 0.5,
         **kwargs,
     ):
         """2-D cross-section of the strain field using matplotlib.
@@ -688,17 +697,30 @@ class DVCMesh:
         normal : ``'x'``, ``'y'``, ``'z'`` or int index
             Normal direction of the slice plane.
         origin : float, optional
-            Position of the plane along *normal*; defaults to the mesh
-            mid-point.
+            Position of the plane along *normal* in physical units; defaults
+            to the mesh mid-point.
         thickness : float, optional
             Slab half-width used to select elements.  Defaults to ~1.5×
             the estimated element size along *normal*.
         step : int, optional
             Step to display; switches the active step when given.
         cmap : str
-            Matplotlib colour map (default ``'RdBu_r'``).
+            Matplotlib colour map (default ``'jet'``).
         ax : matplotlib Axes, optional
             Existing axes; a new figure is created when *None*.
+        pct : ReferencePCT, optional
+            Reference PCT volume.  When supplied, a grayscale slice is drawn
+            as a fully opaque background and the strain overlay is rendered
+            with transparency *pct_alpha*.
+
+            Axis convention assumed:
+
+            * ``pct.vol`` shape ``(Nz, Ny, Nx)`` — PCT axis 0 = Z, 1 = Y, 2 = X.
+            * DVC node coordinates (xo, yo, zo) are voxel indices into that
+              same volume (DVC x → PCT axis 2, DVC y → 1, DVC z → 0).
+        pct_alpha : float
+            Opacity of the strain overlay when *pct* is given (0 = fully
+            transparent, 1 = fully opaque).  Default ``0.5``.
         **kwargs
             Forwarded to ``ax.tripcolor()``.
 
@@ -744,6 +766,36 @@ class DVCMesh:
         else:
             fig = ax.figure
 
+        # --- PCT grayscale background ----------------------------------------
+        if pct is not None:
+            px = self.pixel_size
+            # DVC axis i → PCT axis (2 - i):  DVC x(0)→PCT 2, y(1)→1, z(2)→0
+            pct_ni = 2 - ni
+            slice_idx = int(np.clip(
+                round(origin / px), 0, pct.vol.shape[pct_ni] - 1
+            ))
+            pct_slice = np.take(pct.vol, slice_idx, axis=pct_ni)  # 2D
+
+            # np.take leaves remaining PCT axes in sorted order.
+            # Map each remaining PCT axis back to its DVC axis (2 - pct_ax).
+            # If the first remaining dimension corresponds to h0, the array is
+            # (n_h0, n_h1) and must be transposed to (n_h1, n_h0) for imshow.
+            remaining_pct = sorted(a for a in range(3) if a != pct_ni)
+            if (2 - remaining_pct[0]) == h0:
+                pct_slice = pct_slice.T
+
+            # Physical extent along h0 (horizontal) and h1 (vertical)
+            n_h0 = pct.vol.shape[2 - h0]
+            n_h1 = pct.vol.shape[2 - h1]
+            extent_pct = [0, n_h0 * px, 0, n_h1 * px]
+            ax.imshow(
+                pct_slice, cmap="gray", extent=extent_pct,
+                origin="lower", aspect="auto",
+            )
+            # Strain drawn on top with reduced opacity
+            kwargs.setdefault("alpha", pct_alpha)
+
+        # --- Strain overlay --------------------------------------------------
         try:
             tri = mtri.Triangulation(x, y)
             mappable = ax.tripcolor(tri, z, cmap=cmap, **kwargs)
@@ -771,8 +823,10 @@ class DVCMesh:
     ):
         """Plot strain history at the element(s) nearest to given coordinate(s).
 
-        For each loading step the requested strain component is averaged over
-        the element's Gauss points and plotted against the step index.
+        Strain is computed in a single vectorised pass over all steps — the
+        Jacobian is built once from the reference configuration for the target
+        elements only, then the displacement gradient is evaluated for every
+        step simultaneously with one einsum.
 
         Parameters
         ----------
@@ -784,8 +838,7 @@ class DVCMesh:
             for Voigt strain components; ``'von_mises'`` for equivalent
             strain; ``'volumetric'`` for the trace.
         ref_step : int
-            Step used to compute element centroids for nearest-element
-            search (default 0 = reference configuration).
+            Step used to locate element centroids (default 0).
         ax : matplotlib Axes, optional
             Existing axes to draw on; a new figure is created if *None*.
 
@@ -800,28 +853,28 @@ class DVCMesh:
         n_coords = len(coords)
 
         ref_nodes_phys = (self._ref_nodes + self._U_all[ref_step]) * self.pixel_size
-        centroids = ref_nodes_phys[self.connectivity].mean(axis=1)   # (n_elems, 3)
+        centroids = ref_nodes_phys[self.connectivity].mean(axis=1)
         elem_indices = np.array([
             int(np.argmin(np.linalg.norm(centroids - c, axis=1)))
             for c in coords
         ])
 
+        # Compute strain for target elements across ALL steps in one pass:
+        # → (n_steps, n_coords, n_gauss, 6)
+        strain_hist = self._strain_history_at_elems(elem_indices)
+
         _VOIGT = {"xx": 0, "yy": 1, "zz": 2, "xy": 3, "xz": 4, "yz": 5}
-
-        def _probe(strain_all, ei):
-            s = strain_all[ei]                  # (n_gauss, 6)
-            if component in _VOIGT:
-                return float(s[:, _VOIGT[component]].mean())
-            return float(_invariants_from_voigt(s)[component].mean())
-
-        saved = self._step
-        values = np.zeros((n_coords, self.n_steps))
-        for s in range(self.n_steps):
-            self.select_step(s)
-            strain_s = self.compute_strain()    # (n_elems, n_gauss, 6)
-            for ci, ei in enumerate(elem_indices):
-                values[ci, s] = _probe(strain_s, ei)
-        self.select_step(saved)
+        if component in _VOIGT:
+            # (n_steps, n_coords, n_gauss) → mean over gauss → (n_coords, n_steps)
+            values = strain_hist[..., _VOIGT[component]].mean(axis=2).T
+        else:
+            inv = _invariants_from_voigt(strain_hist)
+            if component not in inv:
+                raise ValueError(
+                    f"Unknown component '{component}'. "
+                    f"Choose from: {sorted(_VOIGT) + ['von_mises', 'volumetric']}"
+                )
+            values = inv[component].mean(axis=2).T  # (n_coords, n_steps)
 
         if ax is None:
             fig, ax = plt.subplots()
@@ -848,6 +901,44 @@ class DVCMesh:
         """Set ``displacement`` and deformed ``nodes`` for the given step."""
         self.displacement: np.ndarray = self._U_all[step]                      # (n_nodes, 3)
         self.nodes: np.ndarray = self._ref_nodes + self.displacement            # (n_nodes, 3)
+
+    def _strain_history_at_elems(self, elem_indices: np.ndarray) -> np.ndarray:
+        """Voigt strain for specific elements across all steps in one pass.
+
+        The Jacobian is built once from the reference configuration — valid for
+        the small-strain regime typical of DVC.  Displacements for all steps
+        are then contracted in a single einsum so there is no Python loop over
+        steps.
+
+        Parameters
+        ----------
+        elem_indices : ndarray ``(n_target,)``
+
+        Returns
+        -------
+        strain : ndarray ``(n_steps, n_target, n_gauss, 6)``
+            Voigt components ``[εxx, εyy, εzz, εxy, εxz, εyz]``.
+        """
+        conn          = self.connectivity[elem_indices]      # (n_target, 8)
+        ref_elem_nodes = self._ref_nodes[conn]               # (n_target, 8, 3)
+
+        # Jacobian and physical shape-function derivatives — computed once
+        J     = np.einsum('gki,ekj->egij', _HEX8_dN_NAT, ref_elem_nodes)
+        J_inv = np.linalg.inv(J)                             # (n_target, n_gauss, 3, 3)
+        dN    = np.einsum('egji,gki->egjk', J_inv, _HEX8_dN_NAT)  # (n_target, n_gauss, 3, 8)
+
+        # Displacements for every step at target-element nodes: (n_steps, n_target, 8, 3)
+        disp_all = self._U_all[:, conn, :]
+
+        # Displacement gradient for all steps at once: (n_steps, n_target, n_gauss, 3, 3)
+        # H[s,e,g,i,j] = ∂u_i/∂x_j = Σ_k dN[e,g,j,k] · disp[s,e,k,i]
+        H   = np.einsum('egjk,seki->segij', dN, disp_all)
+        eps = 0.5 * (H + H.transpose(0, 1, 2, 4, 3))
+
+        return np.stack([
+            eps[..., 0, 0], eps[..., 1, 1], eps[..., 2, 2],
+            eps[..., 0, 1], eps[..., 0, 2], eps[..., 1, 2],
+        ], axis=-1)                                          # (n_steps, n_target, n_gauss, 6)
 
     def _strain_cell_data(self, component: str) -> np.ndarray:
         """Return Gauss-point-averaged strain scalar per element ``(n_elems,)``."""
@@ -929,9 +1020,15 @@ def _invariants_from_voigt(s: np.ndarray) -> dict:
 def _read_mat_params(group) -> dict:
     """Read a flat HDF5 group (MATLAB ``param`` struct) into a Python dict.
 
-    Handles scalars, numeric arrays, byte strings, and MATLAB char arrays
-    stored as ``uint16`` Unicode code points.
+    Handles:
+    * Numeric scalars and arrays
+    * Byte / variable-length / fixed-length HDF5 strings
+    * MATLAB char arrays stored as ``uint16`` Unicode code points
+    * HDF5 object references — dereferenced via the root file (MATLAB stores
+      long strings and cell arrays in the ``#refs#`` group)
     """
+    import h5py
+
     params = {}
     for key in group.keys():
         try:
@@ -939,16 +1036,35 @@ def _read_mat_params(group) -> dict:
         except Exception:
             continue
 
+        # --- resolve HDF5 object references --------------------------------
+        if isinstance(val, h5py.Reference):
+            val = group.file[val][()]
+
+        elif isinstance(val, np.ndarray) and val.dtype == object:
+            refs = val.ravel()
+            if len(refs) and all(isinstance(r, h5py.Reference) for r in refs):
+                # Array of references → decode each chunk, join as string
+                chunks = []
+                for r in refs:
+                    chunk = group.file[r][()]
+                    if isinstance(chunk, np.ndarray) and chunk.dtype == np.uint16:
+                        chunks.append("".join(chr(c) for c in chunk.ravel() if c != 0))
+                    elif isinstance(chunk, bytes):
+                        chunks.append(chunk.decode("utf-8", errors="replace"))
+                    else:
+                        chunks.append(str(np.squeeze(chunk)))
+                val = "".join(chunks)
+
+        # --- decode string encodings ----------------------------------------
         if isinstance(val, bytes):
             val = val.decode("utf-8", errors="replace")
         elif isinstance(val, np.ndarray):
-            if val.dtype.kind in ("S", "U", "O"):
-                # HDF5 fixed/variable-length strings
+            if val.dtype.kind in ("S", "U"):
                 flat = val.flat[0]
                 val = flat.decode("utf-8", errors="replace") if isinstance(flat, bytes) else flat
             elif val.dtype == np.uint16:
                 # MATLAB char array (UTF-16 code units)
-                val = "".join(chr(c) for c in val.flat if c != 0)
+                val = "".join(chr(c) for c in val.ravel() if c != 0)
             elif val.size == 1:
                 val = val.flat[0]
 
