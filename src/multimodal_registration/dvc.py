@@ -400,18 +400,16 @@ class DVCMesh:
         self.path = path
 
         with h5py.File(path, "r") as f:
-            # Nnodes / Nelems are stored per axis, e.g. [56, 24, 76]
+            # Per-axis counts — Nnodes/Nelems shape (3, 1), e.g. [56, 24, 76]
             _nnodes = np.array(f["Nnodes"][()], dtype=int).ravel()
             _nelems = np.array(f["Nelems"][()], dtype=int).ravel()
             self.n_nodes_per_axis = tuple(_nnodes.tolist())
             self.n_elems_per_axis = tuple(_nelems.tolist())
             self.n_nodes = int(_nnodes.prod())
             self.n_elems = int(_nelems.prod())
-
-            self.n_steps = int(np.array(f["ns"][()]).ravel()[0])
-            self.n_gauss = int(np.array(f["ng"][()]).ravel()[0]) if "ng" in f else 8
-            self.n_modes = int(np.array(f["nmod"][()]).ravel()[0]) if "nmod" in f else None
             self.nodes_per_elem = 8   # hex8 — trilinear hexahedra
+            # n_gauss fixed at 8 for hex8 regardless of what ng stores in the file
+            self.n_gauss = 8
 
             self.params = _read_mat_params(f["param"]) if "param" in f else {}
 
@@ -424,18 +422,18 @@ class DVCMesh:
                 self.pixel_size = 1.0
             self.unit = unit
 
-            xo = np.array(f["xo"])
-            yo = np.array(f["yo"])
-            zo = np.array(f["zo"])
+            # xo/yo/zo hold the reference (undeformed) nodal coordinates.
+            # Shape in file: (1, n_nodes) — squeeze to (n_nodes,).
+            xo_ref = np.array(f["xo"]).ravel()
+            yo_ref = np.array(f["yo"]).ravel()
+            zo_ref = np.array(f["zo"]).ravel()
 
-            # U stores mode amplitudes; Smesh is the mode-shape matrix.
-            # MATLAB: U [n_modes, n_steps], Smesh [3·n_nodes, n_modes]
-            # h5py (transposed): U (n_steps, n_modes), Smesh (n_modes, 3·n_nodes)
-            U_raw = np.array(f["U"])
-            Smesh = np.array(f["Smesh"]) if "Smesh" in f else None
+            # U: (n_steps, 3·n_nodes).  DOFs grouped by component:
+            #   [ux_0…ux_{N-1}, uy_0…uy_{N-1}, uz_0…uz_{N-1}]
+            # n_steps is read from U directly — ns in the file is per-axis metadata.
+            U_raw = np.array(f["U"])   # (n_steps, 3·n_nodes)
 
-            # MATLAB stores conn as [n_elems, 8]; h5py reads it as (8, n_elems).
-            # Convert to 0-based indexing for NumPy.
+            # Connectivity: MATLAB [n_elems, 8] → h5py (8, n_elems); 0-based.
             if "conn" in f:
                 conn = np.array(f["conn"], dtype=int)
                 conn = conn.T if conn.shape == (8, self.n_elems) else conn
@@ -443,32 +441,18 @@ class DVCMesh:
             else:
                 self.connectivity = None
 
-            # rint: reshape to (n_steps, n_elems, n_gauss) for intuitive indexing
-            if "rint" in f:
-                rint_raw = np.array(f["rint"])
-                self.rint = _reshape_rint(rint_raw, self.n_steps, self.n_elems, self.n_gauss)
-            else:
-                self.rint = None
+            # Smesh and rint are stored as-is (metadata / scalar flags).
+            self.Smesh = np.array(f["Smesh"]) if "Smesh" in f else None
+            self.rint  = np.array(f["rint"])  if "rint"  in f else None
 
-        # Ensure axis 0 is steps for coordinate arrays → (n_steps, n_nodes)
-        xo = _steps_first(xo, self.n_steps)
-        yo = _steps_first(yo, self.n_steps)
-        zo = _steps_first(zo, self.n_steps)
-        # Stack to (n_steps, n_nodes, 3)
-        self._nodes_all = np.stack([xo, yo, zo], axis=-1)
+        # Reference positions: (n_nodes, 3)
+        self._ref_nodes = np.stack([xo_ref, yo_ref, zo_ref], axis=-1)
 
-        # Reconstruct physical DOFs from mode amplitudes when Smesh is present:
-        #   U_modes (n_steps, n_modes) @ Smesh (n_modes, 3·n_nodes)
-        #   → (n_steps, 3·n_nodes) → reshape (n_steps, n_nodes, 3)
-        # DOF ordering assumed interleaved: [ux0, uy0, uz0, ux1, uy1, uz1, …]
-        if Smesh is not None:
-            self.Smesh = Smesh                              # (n_modes, 3·n_nodes)
-            U_modes = _steps_first(U_raw, self.n_steps)    # (n_steps, n_modes)
-            U_phys  = U_modes @ Smesh                      # (n_steps, 3·n_nodes)
-            self._U_all = U_phys.reshape(self.n_steps, self.n_nodes, 3)
-        else:
-            self.Smesh = None
-            self._U_all = _reshape_U(U_raw, self.n_steps, self.n_nodes)
+        # n_steps comes from U (ns in the file is per-axis mesh metadata)
+        self.n_steps = U_raw.shape[0]
+
+        # Reshape U: grouped DOFs → (n_steps, n_nodes, 3)
+        self._U_all = U_raw.reshape(self.n_steps, 3, self.n_nodes).transpose(0, 2, 1)
 
         # Activate requested step
         idx = step if step >= 0 else self.n_steps + step
@@ -815,7 +799,7 @@ class DVCMesh:
         coords = np.atleast_2d(coords)          # (n_coords, 3)
         n_coords = len(coords)
 
-        ref_nodes_phys = self._nodes_all[ref_step] * self.pixel_size   # (n_nodes, 3)
+        ref_nodes_phys = (self._ref_nodes + self._U_all[ref_step]) * self.pixel_size
         centroids = ref_nodes_phys[self.connectivity].mean(axis=1)   # (n_elems, 3)
         elem_indices = np.array([
             int(np.argmin(np.linalg.norm(centroids - c, axis=1)))
@@ -861,9 +845,9 @@ class DVCMesh:
     # ------------------------------------------------------------------
 
     def _activate(self, step: int) -> None:
-        """Set ``nodes`` and ``displacement`` for the given step."""
-        self.nodes: np.ndarray = self._nodes_all[step]          # (n_nodes, 3)
-        self.displacement: np.ndarray = self._U_all[step]       # (n_nodes, 3)
+        """Set ``displacement`` and deformed ``nodes`` for the given step."""
+        self.displacement: np.ndarray = self._U_all[step]                      # (n_nodes, 3)
+        self.nodes: np.ndarray = self._ref_nodes + self.displacement            # (n_nodes, 3)
 
     def _strain_cell_data(self, component: str) -> np.ndarray:
         """Return Gauss-point-averaged strain scalar per element ``(n_elems,)``."""
@@ -885,64 +869,6 @@ class DVCMesh:
 # DVCMesh module-level helpers
 # ---------------------------------------------------------------------------
 
-def _steps_first(arr: np.ndarray, n_steps: int) -> np.ndarray:
-    """Ensure axis 0 is the step axis; swaps axes when last axis matches."""
-    if arr.ndim < 2:
-        return arr
-    if arr.shape[0] == n_steps:
-        return arr
-    if arr.shape[-1] == n_steps:
-        return np.moveaxis(arr, -1, 0)
-    return arr
-
-
-def _reshape_U(U: np.ndarray, n_steps: int, n_nodes: int) -> np.ndarray:
-    """Coerce the displacement array to shape ``(n_steps, n_nodes, 3)``.
-
-    Handles common MATLAB HDF5 layouts (h5py reads MATLAB arrays transposed):
-
-    * ``(n_steps, n_nodes, 3)`` — already correct
-    * ``(n_steps, 3, n_nodes)`` — transpose last two axes
-    * ``(3, n_nodes, n_steps)`` — fully transposed from MATLAB ``(n_steps, n_nodes, 3)``
-    * ``(n_steps, 3*n_nodes)``  — flat DOFs, step-first
-    * ``(3*n_nodes, n_steps)``  — flat DOFs, transposed
-    """
-    if U.shape == (n_steps, n_nodes, 3):
-        return U
-    if U.shape == (n_steps, 3, n_nodes):
-        return U.transpose(0, 2, 1)
-    if U.shape == (3, n_nodes, n_steps):
-        return U.transpose(2, 1, 0)
-    if U.shape == (n_steps, 3 * n_nodes):
-        return U.reshape(n_steps, n_nodes, 3)
-    if U.shape == (3 * n_nodes, n_steps):
-        return U.T.reshape(n_steps, n_nodes, 3)
-    warnings.warn(
-        f"Unexpected U shape {U.shape} for n_steps={n_steps}, "
-        f"n_nodes={n_nodes}. Returning raw array without reshaping."
-    )
-    return U
-
-
-def _reshape_rint(
-    rint: np.ndarray, n_steps: int, n_elems: int, n_gauss: int
-) -> np.ndarray:
-    """Coerce integration-point results to ``(n_steps, n_elems, n_gauss)``.
-
-    MATLAB stores ``rint`` as ``[n_elems, n_gauss, n_steps]``; h5py reads it
-    as ``(n_steps, n_gauss, n_elems)``.  Additional trailing component axes
-    (e.g. stress tensors) are preserved as-is.
-    """
-    if rint.ndim >= 3 and rint.shape[:3] == (n_steps, n_gauss, n_elems):
-        # swap gauss and elem axes → (n_steps, n_elems, n_gauss, ...)
-        return np.swapaxes(rint, 1, 2)
-    if rint.ndim >= 3 and rint.shape[:3] == (n_steps, n_elems, n_gauss):
-        return rint
-    warnings.warn(
-        f"Unexpected rint shape {rint.shape} for n_steps={n_steps}, "
-        f"n_elems={n_elems}, n_gauss={n_gauss}. Returning raw array."
-    )
-    return rint
 
 
 # ---------------------------------------------------------------------------
