@@ -400,12 +400,17 @@ class DVCMesh:
         self.path = path
 
         with h5py.File(path, "r") as f:
-            self.n_nodes = int(np.squeeze(f["Nnodes"][()]))
-            self.n_elems = int(np.squeeze(f["Nelems"][()]))
-            self.n_steps = int(np.squeeze(f["ns"][()]))
+            # Nnodes / Nelems are stored per axis, e.g. [56, 24, 76]
+            _nnodes = np.array(f["Nnodes"][()], dtype=int).ravel()
+            _nelems = np.array(f["Nelems"][()], dtype=int).ravel()
+            self.n_nodes_per_axis = tuple(_nnodes.tolist())
+            self.n_elems_per_axis = tuple(_nelems.tolist())
+            self.n_nodes = int(_nnodes.prod())
+            self.n_elems = int(_nelems.prod())
 
-            self.n_gauss = int(np.squeeze(f["ng"][()])) if "ng" in f else 8
-            self.n_modes = int(np.squeeze(f["nmod"][()])) if "nmod" in f else None
+            self.n_steps = int(np.array(f["ns"][()]).ravel()[0])
+            self.n_gauss = int(np.array(f["ng"][()]).ravel()[0]) if "ng" in f else 8
+            self.n_modes = int(np.array(f["nmod"][()]).ravel()[0]) if "nmod" in f else None
             self.nodes_per_elem = 8   # hex8 — trilinear hexahedra
 
             self.params = _read_mat_params(f["param"]) if "param" in f else {}
