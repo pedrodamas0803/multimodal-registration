@@ -556,6 +556,7 @@ class DVCMesh:
             eps[..., 0, 0], eps[..., 1, 1], eps[..., 2, 2],
             eps[..., 0, 1], eps[..., 0, 2], eps[..., 1, 2],
         ], axis=-1)                                        # (n_elems, n_gauss, 6)
+        self._strain_step = self._step
         return self.strain
 
     def compute_invariants(self, strain: np.ndarray | None = None) -> dict:
@@ -1045,7 +1046,7 @@ class DVCMesh:
 
     def _strain_cell_data(self, component: str) -> np.ndarray:
         """Return Gauss-point-averaged strain scalar per element ``(n_elems,)``."""
-        if not hasattr(self, "strain"):
+        if getattr(self, "_strain_step", None) != self._step:
             self.compute_strain()
         _VOIGT = {"xx": 0, "yy": 1, "zz": 2, "xy": 3, "xz": 4, "yz": 5}
         if component in _VOIGT:
