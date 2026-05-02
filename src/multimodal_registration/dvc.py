@@ -762,8 +762,15 @@ class DVCMesh:
             )
 
         px = self.pixel_size
-        x = centroids_px[mask, h0] * px   # physical units for display
-        y = centroids_px[mask, h1] * px
+
+        # ROI offsets: params.roi = [x_start, x_end, y_start, y_end, z_start, z_end]
+        # roi_off[i] = start of the DVC mesh along DVC axis i in PCT pixel coords.
+        _roi = np.asarray(self.params.get("roi", np.zeros(6))).ravel()
+        roi_off = np.array([_roi[0], _roi[2], _roi[4]], dtype=float)  # [x, y, z] starts
+
+        # Display coordinates in PCT reference frame (local + ROI offset, then × px)
+        x = (centroids_px[mask, h0] + roi_off[h0]) * px
+        y = (centroids_px[mask, h1] + roi_off[h1]) * px
         z = vals[mask]
 
         if ax is None:
@@ -773,23 +780,23 @@ class DVCMesh:
 
         # --- PCT grayscale background ----------------------------------------
         if pct is not None:
-            # DVC axis i → PCT axis (2 - i):  DVC x(0)→PCT 2, y(1)→1, z(2)→0
-            # origin is already in pixels — use directly as voxel index.
+            # DVC axes (x,y,z) → PCT axes (2,1,0): DVC x→PCT axis 2, z→PCT axis 0
             pct_ni = 2 - ni
+            # Slice index in PCT = local DVC origin + ROI start along that axis
             slice_idx = int(np.clip(
-                round(origin), 0, pct.vol.shape[pct_ni] - 1
+                round(roi_off[ni] + origin), 0, pct.vol.shape[pct_ni] - 1
             ))
             pct_slice = np.take(pct.vol, slice_idx, axis=pct_ni)  # 2D
 
             # np.take leaves remaining PCT axes in sorted order.
-            # Map each remaining PCT axis back to its DVC axis (2 - pct_ax).
-            # If the first remaining dimension corresponds to h0, the array is
-            # (n_h0, n_h1) and must be transposed to (n_h1, n_h0) for imshow.
+            # PCT axis k ↔ DVC axis (2-k). If the first remaining PCT axis maps
+            # to DVC h0, the array is (n_h0, n_h1) and needs a transpose to
+            # (n_h1, n_h0) so imshow rows = h1 (vertical) and cols = h0 (horizontal).
             remaining_pct = sorted(a for a in range(3) if a != pct_ni)
             if (2 - remaining_pct[0]) == h0:
                 pct_slice = pct_slice.T
 
-            # Physical extent along h0 (horizontal) and h1 (vertical)
+            # Physical extent: PCT axis k has size pct.vol.shape[k]; DVC axis i = PCT axis (2-i)
             n_h0 = pct.vol.shape[2 - h0]
             n_h1 = pct.vol.shape[2 - h1]
             extent_pct = [0, n_h0 * px, 0, n_h1 * px]
@@ -813,7 +820,7 @@ class DVCMesh:
         ax.set_ylabel(f"{axis_names[h1]}{unit_label}")
         ax.set_title(
             f"Strain ({component})  |  "
-            f"{axis_names[ni]} = {origin * self.pixel_size:.3g}{unit_label}  |  "
+            f"{axis_names[ni]} = {(roi_off[ni] + origin) * px:.3g}{unit_label}  |  "
             f"step {self._step}"
         )
         ax.set_aspect("equal")
