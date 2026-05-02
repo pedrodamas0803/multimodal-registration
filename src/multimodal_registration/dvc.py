@@ -835,6 +835,124 @@ class DVCMesh:
 
         return fig, ax, mappable
 
+    def pick_point(
+        self,
+        normal: str | int = "z",
+        origin: float | None = None,
+        component: str = "von_mises",
+        n_points: int = -1,
+        **slice_kwargs,
+    ) -> list:
+        """Interactive coordinate selector on a strain slice.
+
+        Displays a strain slice and lets the user click to pick points.
+        Each click records the 3-D coordinate in the PCT physical reference
+        frame — the same units expected by :meth:`plot_strain_history`.
+
+        Parameters
+        ----------
+        normal : ``'x'``, ``'y'``, ``'z'`` or int
+            Slice normal (same as :meth:`plot_strain_slice`).
+        origin : float, optional
+            Slice position in DVC local pixels.  Defaults to mesh mid-point.
+        component : str
+            Strain component shown in the slice.
+        n_points : int
+            Stop after this many clicks (default ``-1`` = unlimited).
+            Right-click or ``q`` / ``Escape`` finishes collection at any time.
+        **slice_kwargs
+            Forwarded to :meth:`plot_strain_slice` (e.g. ``pct``,
+            ``pct_alpha``, ``cmap``).
+
+        Returns
+        -------
+        coords : list of ndarray ``(3,)``
+            Selected points in PCT physical units ``(x, y, z)``, ready to
+            pass directly to :meth:`plot_strain_history`.
+
+        Notes
+        -----
+        * **Left-click** — add a point.
+        * **Right-click** or key **q / Escape** — finish early.
+        * Works with ``%matplotlib widget`` (ipympl) in Jupyter and with
+          interactive matplotlib backends in scripts.
+        """
+        _AXES = {"x": 0, "y": 1, "z": 2}
+        ni = _AXES[normal.lower()] if isinstance(normal, str) else int(normal)
+        h0, h1 = (ni + 1) % 3, (ni + 2) % 3
+
+        # Resolve default origin the same way plot_strain_slice does
+        if origin is None:
+            cn = self._ref_nodes[self.connectivity].mean(axis=1)[:, ni]
+            origin = float(cn.mean())
+
+        # Physical coordinate of the slice plane along the normal axis
+        _roi = np.asarray(self.params.get("roi", np.zeros(6))).ravel()
+        roi_off = np.array([_roi[0], _roi[2], _roi[4]], dtype=float)
+        px = self.pixel_size
+        slice_phys = (roi_off[ni] + origin) * px
+
+        fig, ax, _ = self.plot_strain_slice(
+            component=component, normal=normal, origin=origin, **slice_kwargs
+        )
+
+        limit = f"max {n_points}" if n_points > 0 else "unlimited"
+        ax.set_title(
+            ax.get_title()
+            + f"\nLeft-click: add point ({limit}) | Right-click / q: finish"
+        )
+        fig.canvas.draw_idle()
+
+        coords: list = []
+        _cids: list = []
+
+        def _disconnect():
+            for cid in _cids:
+                try:
+                    fig.canvas.mpl_disconnect(cid)
+                except Exception:
+                    pass
+            _cids.clear()
+
+        def _on_click(event):
+            if event.inaxes is not ax or event.xdata is None:
+                return
+            if event.button == 3:          # right-click → finish
+                _disconnect()
+                return
+            if event.button != 1:
+                return
+
+            coord = np.zeros(3)
+            coord[h0] = event.xdata
+            coord[h1] = event.ydata
+            coord[ni] = slice_phys
+            coords.append(coord)
+
+            idx = len(coords)
+            ax.plot(event.xdata, event.ydata, "*",
+                    color="white", markersize=14,
+                    markeredgecolor="black", markeredgewidth=1.0,
+                    zorder=10)
+            ax.annotate(
+                str(idx), (event.xdata, event.ydata),
+                xytext=(4, 4), textcoords="offset points",
+                fontsize=8, fontweight="bold", color="black", zorder=11,
+            )
+            fig.canvas.draw_idle()
+
+            if n_points > 0 and idx >= n_points:
+                _disconnect()
+
+        def _on_key(event):
+            if event.key in ("q", "escape"):
+                _disconnect()
+
+        _cids.append(fig.canvas.mpl_connect("button_press_event", _on_click))
+        _cids.append(fig.canvas.mpl_connect("key_press_event", _on_key))
+
+        return coords
+
     def plot_strain_history(
         self,
         coords,
@@ -970,7 +1088,7 @@ class DVCMesh:
                 yi = cur_centroids_phys[mask, h1]
                 zi = inset_vals[mask]
 
-                axins = ax.inset_axes([0.63, 0.04, 0.35, 0.35])
+                axins = ax.inset_axes(_emptiest_corner(ax, x_axis, values))
                 try:
                     tri = mtri.Triangulation(xi, yi)
                     axins.tripcolor(tri, zi, cmap="jet")
@@ -1063,6 +1181,33 @@ class DVCMesh:
 # ---------------------------------------------------------------------------
 # DVCMesh module-level helpers
 # ---------------------------------------------------------------------------
+
+def _emptiest_corner(ax, x_axis, values: np.ndarray) -> list:
+    """Return ``inset_axes`` bounds for the corner of *ax* least occupied by curves.
+
+    Divides the current axes bounding box into four quadrants, counts how many
+    (x, y) data points fall in each, and returns the ``[x0, y0, w, h]``
+    specification (in axes-fraction coordinates) for the emptiest corner.
+    """
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+    xmid = 0.5 * (xlim[0] + xlim[1])
+    ymid = 0.5 * (ylim[0] + ylim[1])
+
+    # counts[right + 2*top]: BL=0, BR=1, TL=2, TR=3
+    counts = np.zeros(4, dtype=int)
+    for row in values:
+        for xv, yv in zip(x_axis, row):
+            counts[int(xv > xmid) + 2 * int(yv > ymid)] += 1
+
+    w, h, pad = 0.33, 0.33, 0.03
+    corners = [
+        [pad,         pad,         w, h],  # BL
+        [1 - pad - w, pad,         w, h],  # BR
+        [pad,         1 - pad - h, w, h],  # TL
+        [1 - pad - w, 1 - pad - h, w, h],  # TR
+    ]
+    return corners[int(np.argmin(counts))]
 
 
 
