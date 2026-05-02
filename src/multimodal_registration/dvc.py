@@ -942,9 +942,12 @@ class DVCMesh:
             h0, h1 = (ni + 1) % 3, (ni + 2) % 3
             axis_names = ["x", "y", "z"]
 
-            # Centroids in PCT physical coords
-            centroids_phys = (centroids_local + roi_off) * px  # (n_elems, 3)
-            cn = centroids_phys[:, ni]
+            # Use the CURRENT active step's centroids — same source as
+            # plot_strain_slice — so the slice selection is identical.
+            cur_centroids_phys = (
+                self.nodes[self.connectivity].mean(axis=1) + roi_off
+            ) * px                                               # (n_elems, 3)
+            cn = cur_centroids_phys[:, ni]
 
             # Slice at mean query-point position along the normal
             slice_origin = float(np.mean(coords[:, ni]))
@@ -954,14 +957,14 @@ class DVCMesh:
             mask = np.abs(cn - slice_origin) <= thickness / 2
 
             if mask.sum() > 2:
-                # Strain values for the inset (save/restore to avoid side-effects)
+                # Strain values at the current step (save/restore self.strain)
                 _saved = getattr(self, "strain", None)
                 inset_vals = self._strain_cell_data(inset_component)
                 if _saved is not None:
                     self.strain = _saved
 
-                xi = centroids_phys[mask, h0]
-                yi = centroids_phys[mask, h1]
+                xi = cur_centroids_phys[mask, h0]
+                yi = cur_centroids_phys[mask, h1]
                 zi = inset_vals[mask]
 
                 axins = ax.inset_axes([0.63, 0.04, 0.35, 0.35])
@@ -970,6 +973,13 @@ class DVCMesh:
                     axins.tripcolor(tri, zi, cmap="jet")
                 except Exception:
                     axins.scatter(xi, yi, c=zi, cmap="jet", s=4)
+
+                # Pin axes limits to the mesh region BEFORE plotting the star
+                # so the star never stretches the view beyond the mesh bounds.
+                pad_h = 0.05 * max(xi.ptp(), 1.0)
+                pad_v = 0.05 * max(yi.ptp(), 1.0)
+                axins.set_xlim(xi.min() - pad_h, xi.max() + pad_h)
+                axins.set_ylim(yi.min() - pad_v, yi.max() + pad_v)
 
                 for c in coords:
                     axins.plot(c[h0], c[h1], "*", color="white",
