@@ -1047,14 +1047,12 @@ class DVCMesh:
         else:
             fig = ax.figure
 
-        for ci, (c, ei) in enumerate(zip(coords, elem_indices)):
-            label = f"({c[0]:.2g}, {c[1]:.2g}, {c[2]:.2g}){unit_label}  [elem {ei}]"
-            ax.plot(x_axis, values[ci], "o-", label=label)
+        for ci in range(n_coords):
+            ax.plot(x_axis, values[ci], "o-", label=str(ci + 1))
 
         ax.set_xlabel(x_label)
         ax.set_ylabel(f"Strain — {component}")
-        if n_coords > 1:
-            ax.legend()
+        ax.legend()
 
         # --- inset locator ---------------------------------------------------
         if show_inset:
