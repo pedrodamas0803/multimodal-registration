@@ -534,10 +534,12 @@ class DVCMesh:
             Voigt components ``[ε_xx, ε_yy, ε_zz, ε_xy, ε_xz, ε_yz]``.
             Also stored as ``self.strain``.
         """
-        elem_nodes = self.nodes[self.connectivity]        # (n_elems, 8, 3)
+        # Reference positions for the Jacobian — Lagrangian (reference-frame)
+        # strain, consistent with _strain_history_at_elems.
+        elem_nodes = self._ref_nodes[self.connectivity]   # (n_elems, 8, 3)
         elem_disp  = self.displacement[self.connectivity] # (n_elems, 8, 3)
 
-        # Jacobian at every (element, Gauss point): J[e,g,i,j] = ∂x_j/∂ξ_i
+        # Jacobian at every (element, Gauss point): J[e,g,i,j] = ∂X_j/∂ξ_i
         J = np.einsum('gki,ekj->egij', _HEX8_dN_NAT, elem_nodes)
         J_inv = np.linalg.inv(J)                          # (n_elems, n_gauss, 3, 3)
 
@@ -617,7 +619,7 @@ class DVCMesh:
         cells = np.hstack([prefix, self.connectivity]).ravel()
         celltypes = np.full(self.n_elems, 12, dtype=np.uint8)   # VTK_HEXAHEDRON
 
-        grid = pv.UnstructuredGrid(cells, celltypes, self.nodes_phys)
+        grid = pv.UnstructuredGrid(cells, celltypes, self._ref_nodes * self.pixel_size)
         if component is not None:
             grid.cell_data[component] = self._strain_cell_data(component)
         return grid
@@ -748,8 +750,8 @@ class DVCMesh:
             self.select_step(step)
         vals = self._strain_cell_data(component)           # (n_elems,)
 
-        # Centroids in pixel units — pixel_size is applied only for display.
-        centroids_px = self.nodes[self.connectivity].mean(axis=1)  # (n_elems, 3)
+        # Reference-frame centroids — pixel_size applied only for display.
+        centroids_px = self._ref_nodes[self.connectivity].mean(axis=1)  # (n_elems, 3)
         cn = centroids_px[:, ni]
 
         if origin is None:
@@ -942,10 +944,10 @@ class DVCMesh:
             h0, h1 = (ni + 1) % 3, (ni + 2) % 3
             axis_names = ["x", "y", "z"]
 
-            # Use the CURRENT active step's centroids — same source as
-            # plot_strain_slice — so the slice selection is identical.
+            # Reference-frame centroids — same source as plot_strain_slice —
+            # so the slice selection and layout are always consistent.
             cur_centroids_phys = (
-                self.nodes[self.connectivity].mean(axis=1) + roi_off
+                self._ref_nodes[self.connectivity].mean(axis=1) + roi_off
             ) * px                                               # (n_elems, 3)
             cn = cur_centroids_phys[:, ni]
 
