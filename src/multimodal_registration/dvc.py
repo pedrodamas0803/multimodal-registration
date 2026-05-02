@@ -394,6 +394,7 @@ class DVCMesh:
         step: int = -1,
         pixel_size: float | None = None,
         unit: str = "px",
+        timestamps: list | np.ndarray | None = None,
     ):
         import h5py
 
@@ -463,6 +464,10 @@ class DVCMesh:
 
         # Reshape U: grouped DOFs → (n_steps, n_nodes, 3)
         self._U_all = U_raw.reshape(self.n_steps, 3, self.n_nodes).transpose(0, 2, 1)
+
+        self.timestamps: np.ndarray | None = (
+            np.asarray(timestamps, dtype=float) if timestamps is not None else None
+        )
 
         # Activate requested step
         idx = step if step >= 0 else self.n_steps + step
@@ -833,27 +838,36 @@ class DVCMesh:
         component: str = "von_mises",
         ref_step: int = 0,
         ax=None,
+        show_inset: bool = True,
+        inset_normal: str | int = "z",
+        inset_component: str = "von_mises",
     ):
         """Plot strain history at the element(s) nearest to given coordinate(s).
 
-        Strain is computed in a single vectorised pass over all steps — the
-        Jacobian is built once from the reference configuration for the target
-        elements only, then the displacement gradient is evaluated for every
-        step simultaneously with one einsum.
+        Strain is computed in a single vectorised pass over all steps.
+        Coordinates use the same reference frame as :meth:`plot_strain_slice`:
+        physical units in the PCT reference volume
+        ``(dvc_local + roi_offset) * pixel_size``.
 
         Parameters
         ----------
         coords : array-like ``(3,)`` or list of ``(3,)``
-            Pixel coordinate(s) ``(x, y, z)`` to probe.  Each point is
-            matched to the nearest element centroid at *ref_step*.
+            Physical coordinate(s) ``(x, y, z)`` in the PCT reference frame
+            (same units and origin as shown in :meth:`plot_strain_slice`).
         component : str
-            ``'xx'``, ``'yy'``, ``'zz'``, ``'xy'``, ``'xz'``, ``'yz'``
-            for Voigt strain components; ``'von_mises'`` for equivalent
-            strain; ``'volumetric'`` for the trace.
+            ``'xx'``, ``'yy'``, ``'zz'``, ``'xy'``, ``'xz'``, ``'yz'``,
+            ``'von_mises'``, or ``'volumetric'``.
         ref_step : int
             Step used to locate element centroids (default 0).
         ax : matplotlib Axes, optional
             Existing axes to draw on; a new figure is created if *None*.
+        show_inset : bool
+            When *True* (default) an inset axes is added showing a strain
+            slice with each query point marked.
+        inset_normal : ``'x'``, ``'y'``, ``'z'`` or int
+            Normal direction of the inset slice plane (default ``'z'``).
+        inset_component : str
+            Strain component shown in the inset (default ``'von_mises'``).
 
         Returns
         -------
@@ -861,24 +875,33 @@ class DVCMesh:
             ``values`` has shape ``(n_coords, n_steps)``.
         """
         import matplotlib.pyplot as plt
+        import matplotlib.tri as mtri
 
-        coords = np.atleast_2d(coords)          # (n_coords, 3)
+        # --- coordinate frame ------------------------------------------------
+        _roi = np.asarray(self.params.get("roi", np.zeros(6))).ravel()
+        roi_off = np.array([_roi[0], _roi[2], _roi[4]], dtype=float)
+        px = self.pixel_size
+        unit_label = f" [{self.unit}]" if self.unit else ""
+
+        coords = np.atleast_2d(coords)          # (n_coords, 3) — PCT physical
         n_coords = len(coords)
 
-        ref_nodes_px = self._ref_nodes + self._U_all[ref_step]   # pixel units
-        centroids = ref_nodes_px[self.connectivity].mean(axis=1)
+        # Convert to DVC local pixel coords for element search
+        coords_local = coords / px - roi_off    # (n_coords, 3)
+
+        ref_nodes_px = self._ref_nodes + self._U_all[ref_step]
+        centroids_local = ref_nodes_px[self.connectivity].mean(axis=1)  # (n_elems, 3)
         elem_indices = np.array([
-            int(np.argmin(np.linalg.norm(centroids - c, axis=1)))
-            for c in coords
+            int(np.argmin(np.linalg.norm(centroids_local - c, axis=1)))
+            for c in coords_local
         ])
 
-        # Compute strain for target elements across ALL steps in one pass:
-        # → (n_steps, n_coords, n_gauss, 6)
+        # --- strain history (single einsum pass) -----------------------------
         strain_hist = self._strain_history_at_elems(elem_indices)
+        # → (n_steps, n_coords, n_gauss, 6)
 
         _VOIGT = {"xx": 0, "yy": 1, "zz": 2, "xy": 3, "xz": 4, "yz": 5}
         if component in _VOIGT:
-            # (n_steps, n_coords, n_gauss) → mean over gauss → (n_coords, n_steps)
             values = strain_hist[..., _VOIGT[component]].mean(axis=2).T
         else:
             inv = _invariants_from_voigt(strain_hist)
@@ -887,22 +910,77 @@ class DVCMesh:
                     f"Unknown component '{component}'. "
                     f"Choose from: {sorted(_VOIGT) + ['von_mises', 'volumetric']}"
                 )
-            values = inv[component].mean(axis=2).T  # (n_coords, n_steps)
+            values = inv[component].mean(axis=2).T   # (n_coords, n_steps)
 
+        # --- x-axis: timestamps or step indices ------------------------------
+        if self.timestamps is not None:
+            x_axis = self.timestamps
+            x_label = "Time"
+        else:
+            x_axis = np.arange(self.n_steps)
+            x_label = "Step"
+
+        # --- main figure -----------------------------------------------------
         if ax is None:
             fig, ax = plt.subplots()
         else:
             fig = ax.figure
 
-        steps = np.arange(self.n_steps)
         for ci, (c, ei) in enumerate(zip(coords, elem_indices)):
-            label = f"({c[0]:.2g}, {c[1]:.2g}, {c[2]:.2g})  [elem {ei}]"
-            ax.plot(steps, values[ci], "o-", label=label)
+            label = f"({c[0]:.2g}, {c[1]:.2g}, {c[2]:.2g}){unit_label}  [elem {ei}]"
+            ax.plot(x_axis, values[ci], "o-", label=label)
 
-        ax.set_xlabel("Step")
+        ax.set_xlabel(x_label)
         ax.set_ylabel(f"Strain — {component}")
         if n_coords > 1:
             ax.legend()
+
+        # --- inset locator ---------------------------------------------------
+        if show_inset:
+            _AXES_MAP = {"x": 0, "y": 1, "z": 2}
+            ni = _AXES_MAP[inset_normal.lower()] if isinstance(inset_normal, str) else int(inset_normal)
+            h0, h1 = (ni + 1) % 3, (ni + 2) % 3
+            axis_names = ["x", "y", "z"]
+
+            # Centroids in PCT physical coords
+            centroids_phys = (centroids_local + roi_off) * px  # (n_elems, 3)
+            cn = centroids_phys[:, ni]
+
+            # Slice at mean query-point position along the normal
+            slice_origin = float(np.mean(coords[:, ni]))
+            extent_n = float(cn.ptp())
+            n_layers = max(round(self.n_elems ** (1 / 3)), 1)
+            thickness = 1.5 * extent_n / n_layers
+            mask = np.abs(cn - slice_origin) <= thickness / 2
+
+            if mask.sum() > 2:
+                # Strain values for the inset (save/restore to avoid side-effects)
+                _saved = getattr(self, "strain", None)
+                inset_vals = self._strain_cell_data(inset_component)
+                if _saved is not None:
+                    self.strain = _saved
+
+                xi = centroids_phys[mask, h0]
+                yi = centroids_phys[mask, h1]
+                zi = inset_vals[mask]
+
+                axins = ax.inset_axes([0.63, 0.04, 0.35, 0.35])
+                try:
+                    tri = mtri.Triangulation(xi, yi)
+                    axins.tripcolor(tri, zi, cmap="jet")
+                except Exception:
+                    axins.scatter(xi, yi, c=zi, cmap="jet", s=4)
+
+                for c in coords:
+                    axins.plot(c[h0], c[h1], "*", color="white",
+                               markersize=8, markeredgecolor="black",
+                               markeredgewidth=0.5)
+
+                axins.set_xlabel(f"{axis_names[h0]}{unit_label}", fontsize=6)
+                axins.set_ylabel(f"{axis_names[h1]}{unit_label}", fontsize=6)
+                axins.tick_params(labelsize=5)
+                axins.set_aspect("equal")
+                axins.set_title(inset_component, fontsize=6)
 
         return fig, ax, values
 
