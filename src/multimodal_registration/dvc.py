@@ -920,6 +920,11 @@ class DVCMesh:
                 ax.get_title()
                 + f"\nHover figure to read coords from toolbar ({limit_str})"
             )
+            try:
+                fig.canvas.toolbar_visible = True
+                fig.canvas.header_visible = False
+            except AttributeError:
+                pass
             fig.canvas.draw_idle()
 
             _w_h0 = _w.FloatText(value=0.0, description=f"{_h0_lbl}:",
