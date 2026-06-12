@@ -8,7 +8,7 @@ dependencies:
   - scipy>=1.10
   - h5py>=3.8
   - scikit-image>=0.21
-  - matplotlib>=3.7
+  - matplotlib>=3.7,<3.9  # 3.9+ breaks click events with ipympl 0.9.x
   - ipykernel
   - ipywidgets>=8.0
   - ipympl=0.9.8        # must stay <0.10 to match ESRF JupyterHub's jupyter-matplotlib 0.11.x
