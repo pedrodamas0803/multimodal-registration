@@ -918,11 +918,12 @@ class DVCMesh:
 
             ax.set_title(
                 ax.get_title()
-                + f"\nHover figure to read coords from toolbar ({limit_str})"
+                + f"\nHover figure → coordinates update below ({limit_str})"
             )
             try:
-                fig.canvas.toolbar_visible = True
+                fig.canvas.toolbar_visible = False
                 fig.canvas.header_visible = False
+                fig.canvas.footer_visible = False
             except AttributeError:
                 pass
             fig.canvas.draw_idle()
@@ -931,12 +932,24 @@ class DVCMesh:
                                   layout=_w.Layout(width="180px"))
             _w_h1 = _w.FloatText(value=0.0, description=f"{_h1_lbl}:",
                                   layout=_w.Layout(width="180px"))
+            _coord_lbl = _w.Label(value="Move mouse over figure…")
             _btn_add = _w.Button(description="Add point",
                                   button_style="primary", icon="plus")
             _btn_undo = _w.Button(description="Undo", button_style="warning")
             _btn_done = _w.Button(description="Done", button_style="success")
             _out = _w.Output()
             _markers: list = []
+
+            def _on_motion(event):
+                if event.inaxes is ax and event.xdata is not None:
+                    _coord_lbl.value = (
+                        f"{_h0_lbl} = {event.xdata:.4f}    "
+                        f"{_h1_lbl} = {event.ydata:.4f}"
+                    )
+                    _w_h0.value = round(event.xdata, 4)
+                    _w_h1.value = round(event.ydata, 4)
+
+            fig.canvas.mpl_connect("motion_notify_event", _on_motion)
 
             def _mark(xd, yd, idx):
                 line, = ax.plot(xd, yd, "*", color="white", markersize=14,
@@ -987,6 +1000,7 @@ class DVCMesh:
             _btn_done.on_click(_on_done)
 
             _display(_w.VBox([
+                _coord_lbl,
                 _w.HBox([_w_h0, _w_h1, _btn_add, _btn_undo, _btn_done]),
                 _out,
             ]))
