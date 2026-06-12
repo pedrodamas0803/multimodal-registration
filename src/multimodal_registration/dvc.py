@@ -872,10 +872,12 @@ class DVCMesh:
 
         Notes
         -----
-        * **Left-click** — add a point.
-        * **Right-click** or key **q / Escape** — finish early.
-        * Works with ``%matplotlib widget`` (ipympl) in Jupyter and with
-          interactive matplotlib backends in scripts.
+        * **In Jupyter** — a widget form is shown below the figure.  Hover the
+          figure to read coordinates from the toolbar, type them into the
+          ``x``/``y`` fields, then click **Add point**.  Use **Undo** to remove
+          the last point and **Done** to finish.
+        * **In scripts** — left-click to add, right-click or **q / Escape** to
+          finish (requires an interactive matplotlib backend).
         """
         _AXES = {"x": 0, "y": 1, "z": 2}
         ni = _AXES[normal.lower()] if isinstance(normal, str) else int(normal)
@@ -896,6 +898,96 @@ class DVCMesh:
             component=component, normal=normal, origin=origin, **slice_kwargs
         )
 
+        coords: list = []
+
+        # --- Jupyter: use widget form (matplotlib click events unreliable in
+        # JupyterLab when the ipympl extension version lags the server) ----------
+        try:
+            from IPython import get_ipython as _gip
+            _jupyter = (_gip() is not None) and hasattr(_gip(), "kernel")
+        except Exception:
+            _jupyter = False
+
+        if _jupyter:
+            import ipywidgets as _w
+            from IPython.display import display as _display
+
+            _labels = ["x", "y", "z"]
+            _h0_lbl, _h1_lbl = _labels[h0], _labels[h1]
+            limit_str = f"max {n_points}" if n_points > 0 else "unlimited"
+
+            ax.set_title(
+                ax.get_title()
+                + f"\nHover figure to read coords from toolbar ({limit_str})"
+            )
+            fig.canvas.draw_idle()
+
+            _w_h0 = _w.FloatText(value=0.0, description=f"{_h0_lbl}:",
+                                  layout=_w.Layout(width="180px"))
+            _w_h1 = _w.FloatText(value=0.0, description=f"{_h1_lbl}:",
+                                  layout=_w.Layout(width="180px"))
+            _btn_add = _w.Button(description="Add point",
+                                  button_style="primary", icon="plus")
+            _btn_undo = _w.Button(description="Undo", button_style="warning")
+            _btn_done = _w.Button(description="Done", button_style="success")
+            _out = _w.Output()
+            _markers: list = []
+
+            def _mark(xd, yd, idx):
+                line, = ax.plot(xd, yd, "*", color="white", markersize=14,
+                                markeredgecolor="black", markeredgewidth=1.0,
+                                zorder=10)
+                ann = ax.annotate(
+                    str(idx), (xd, yd), xytext=(4, 4),
+                    textcoords="offset points", fontsize=8,
+                    fontweight="bold", color="black", zorder=11,
+                )
+                return line, ann
+
+            def _refresh(_b=None):
+                _out.clear_output(wait=True)
+                with _out:
+                    for i, c in enumerate(coords):
+                        print(f"  {i+1}: ({c[0]:.4f}, {c[1]:.4f}, {c[2]:.4f})")
+                if n_points > 0 and len(coords) >= n_points:
+                    _btn_add.disabled = True
+
+            def _on_add(_b):
+                coord = np.zeros(3)
+                coord[h0] = _w_h0.value
+                coord[h1] = _w_h1.value
+                coord[ni] = slice_phys
+                coords.append(coord)
+                _markers.append(_mark(_w_h0.value, _w_h1.value, len(coords)))
+                fig.canvas.draw_idle()
+                _refresh()
+
+            def _on_undo(_b):
+                if not coords:
+                    return
+                coords.pop()
+                line, ann = _markers.pop()
+                line.remove()
+                ann.remove()
+                fig.canvas.draw_idle()
+                _btn_add.disabled = False
+                _refresh()
+
+            def _on_done(_b):
+                for btn in (_btn_add, _btn_undo, _btn_done):
+                    btn.disabled = True
+
+            _btn_add.on_click(_on_add)
+            _btn_undo.on_click(_on_undo)
+            _btn_done.on_click(_on_done)
+
+            _display(_w.VBox([
+                _w.HBox([_w_h0, _w_h1, _btn_add, _btn_undo, _btn_done]),
+                _out,
+            ]))
+            return coords
+
+        # --- Script / non-Jupyter: original matplotlib event approach -----------
         limit = f"max {n_points}" if n_points > 0 else "unlimited"
         ax.set_title(
             ax.get_title()
@@ -903,7 +995,6 @@ class DVCMesh:
         )
         fig.canvas.draw_idle()
 
-        coords: list = []
         _cids: list = []
 
         def _disconnect():
@@ -917,7 +1008,7 @@ class DVCMesh:
         def _on_click(event):
             if event.inaxes is not ax or event.xdata is None:
                 return
-            if event.button == 3:          # right-click → finish
+            if event.button == 3:
                 _disconnect()
                 return
             if event.button != 1:

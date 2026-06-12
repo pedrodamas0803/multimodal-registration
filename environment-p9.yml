@@ -1,0 +1,19 @@
+name: multimodal-reg
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy>=1.24
+  - scipy>=1.10
+  - h5py>=3.8
+  - scikit-image>=0.21
+  - matplotlib>=3.7
+  - ipykernel
+  - ipywidgets>=8.0
+  - ipympl=0.9.3        # must match ESRF JupyterHub's jupyter-matplotlib 0.11.3
+  - cupy               # conda-forge ships ppc64le wheels
+  - pip
+  - pip:
+    - pyvista>=0.43
+    - orix>=0.12
