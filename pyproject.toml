@@ -25,8 +25,14 @@ jupyter = ["ipywidgets>=8.0", "ipympl>=0.9"]
 crystal = ["orix>=0.12"]
 # NVIDIA GPU acceleration — pick the wheel matching your CUDA version:
 #   pip install "multimodal-registration[cuda12]"
-cuda11 = ["cupy-cuda11x>=12.0", "cucim-cu11>=23.0"]
-cuda12 = ["cupy-cuda12x>=12.0", "cucim-cu12>=23.0"]
+cuda11 = [
+    "cupy-cuda11x>=12.0",
+    "cucim-cu11>=23.0; platform_machine != 'ppc64le'",
+]
+cuda12 = [
+    "cupy-cuda12x>=12.0",
+    "cucim-cu12>=23.0; platform_machine != 'ppc64le'",
+]
 # Everything except GPU — convenient for a full CPU install
 all = [
     "pyvista>=0.43",
