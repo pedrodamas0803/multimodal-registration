@@ -1000,6 +1000,7 @@ class DVCMesh:
             _btn_undo.on_click(_on_undo)
             _btn_done.on_click(_on_done)
 
+            _display(fig.canvas)
             _display(_w.VBox([
                 _coord_lbl,
                 _w.HBox([_w_h0, _w_h1, _btn_add, _btn_undo, _btn_done]),
