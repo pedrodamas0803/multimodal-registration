@@ -26,11 +26,11 @@ crystal = ["orix>=0.12"]
 # NVIDIA GPU acceleration — pick the wheel matching your CUDA version:
 #   pip install "multimodal-registration[cuda12]"
 cuda11 = [
-    "cupy-cuda11x>=12.0",
+    "cupy-cuda11x>=12.0; platform_machine != 'ppc64le'",
     "cucim-cu11>=23.0; platform_machine != 'ppc64le'",
 ]
 cuda12 = [
-    "cupy-cuda12x>=12.0",
+    "cupy-cuda12x>=12.0; platform_machine != 'ppc64le'",
     "cucim-cu12>=23.0; platform_machine != 'ppc64le'",
 ]
 # Everything except GPU — convenient for a full CPU install
