@@ -904,7 +904,8 @@ class DVCMesh:
         # JupyterLab when the ipympl extension version lags the server) ----------
         try:
             from IPython import get_ipython as _gip
-            _jupyter = (_gip() is not None) and hasattr(_gip(), "kernel")
+            _shell = _gip()
+            _jupyter = _shell is not None and _shell.__class__.__name__ == "ZMQInteractiveShell"
         except Exception:
             _jupyter = False
 
