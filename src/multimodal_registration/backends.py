@@ -14,8 +14,8 @@ import warnings
 
 def _try_cuda():
     try:
-        import cupy as cp
-        import cupyx.scipy.ndimage as cpnd
+        import cupy as cp # type: ignore
+        import cupyx.scipy.ndimage as cpnd # type: ignore
 
         cp.zeros(1)  # trigger driver/context init — raises if no GPU
         return "cuda", cp, cpnd

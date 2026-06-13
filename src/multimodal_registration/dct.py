@@ -118,6 +118,7 @@ class DCT:
             reference PCT volume.
         """
         pad_width = self._calculate_pad_width(target_shape)
+        xp = backends.xp()
 
         for key in self._vol_keys:
             arr: np.ndarray = getattr(self, key)
@@ -127,7 +128,26 @@ class DCT:
                 pw = pad_width + ((0, 0),)  # leave channel axis alone
             else:
                 continue
-            setattr(self, key, np.pad(arr, pw))
+
+            if backends.backend_name() == "cuda":
+                padded_bytes = int(np.prod(
+                    [s + b + a for s, (b, a) in zip(arr.shape, pw)]
+                )) * arr.itemsize
+                try:
+                    import cupy as cp
+                    free = cp.cuda.Device().mem_info[0]
+                    if arr.nbytes + padded_bytes > free:
+                        raise MemoryError
+                    d_arr = backends.to_device(arr)
+                    result = backends.to_numpy(xp.pad(d_arr, pw))
+                    del d_arr
+                    cp.get_default_memory_pool().free_all_blocks()
+                except MemoryError:
+                    result = np.pad(arr, pw)
+            else:
+                result = np.pad(arr, pw)
+
+            setattr(self, key, result)
 
         self.shape = self.GIDvol.shape
 
