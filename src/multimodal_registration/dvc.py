@@ -670,7 +670,12 @@ class DVCMesh:
         self.compute_strain()
         grid = self.to_pyvista(component=component)
 
-        pl = plotter if plotter is not None else pv.Plotter()
+        if plotter is None:
+            if not pv.system_supports_plotting():
+                pv.set_jupyter_backend("static")
+            pl = pv.Plotter()
+        else:
+            pl = plotter
         pl.add_mesh(
             grid,
             scalars=component,

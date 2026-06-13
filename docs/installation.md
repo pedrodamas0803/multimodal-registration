@@ -110,6 +110,73 @@ conda env create -f environment.yml
 
 ---
 
+### POWER9 / ppc64le (e.g. ESRF p9 cluster)
+
+On `ppc64le` machines several PyPI packages have no pre-built wheels, so
+**uv is not usable** on this architecture.  Use mamba with the provided
+`environment-p9.yml` instead, which pins the versions known to work.
+
+**Install micromamba** (no root needed):
+
+```bash
+"${SHELL}" <(curl -L micro.mamba.pm/install.sh)
+# or, if curl is unavailable:
+wget -qO- micro.mamba.pm/install.sh | bash
+```
+
+**Create the environment** (user-local, no admin rights required):
+
+```bash
+mamba env create --prefix ~/.conda/envs/multimodal-reg \
+    -f environment-p9.yml
+mamba activate ~/.conda/envs/multimodal-reg
+```
+
+**Install the project in editable mode:**
+
+```bash
+pip install -e /path/to/multimodal-registration --no-deps
+```
+
+**GPU support** — CuPy must come from conda-forge (no ppc64le wheels on PyPI),
+and cucim is unavailable on this architecture:
+
+```bash
+# Check your CUDA version first
+nvidia-smi | head -3
+
+mamba install -c conda-forge cupy -y
+```
+
+**VTK / PyVista** — also conda-forge only on ppc64le:
+
+```bash
+mamba install -c conda-forge pyvista -y
+```
+
+**Register the Jupyter kernel:**
+
+```bash
+python -m ipykernel install --user \
+    --name multimodal-reg-p9 \
+    --display-name "multimodal-reg (p9 GPU)"
+```
+
+??? note "Version constraints on ppc64le"
+    - **ipympl** is pinned to `0.9.8`. Higher versions are not available on
+      conda-forge for this architecture. If your JupyterHub shows a
+      *"module not registered"* warning, it means the server's
+      `jupyter-matplotlib` extension version does not match — ask your
+      sysadmin to update it, or keep the pin and ignore the warning.
+    - **matplotlib** is pinned to `<3.9`. Matplotlib 3.9+ changed internal
+      event dispatching in a way that breaks interactive click events with
+      ipympl 0.9.x.
+    - **h5py** and **scipy** must come from conda-forge because the system
+      HDF5 library on ppc64le nodes is typically too old to build h5py from
+      source.
+
+---
+
 ## Optional extras
 
 | Extra | Packages added | Required for |
