@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import gc
+import os
+import tempfile
+
 import numpy as np
 import h5py
 import matplotlib.pyplot as plt
@@ -23,13 +27,17 @@ class DCT:
 
     def __init__(self, dct_ds_path: str):
         self._vol_keys: list[str] = []
+        self._tmpdir = tempfile.TemporaryDirectory()
 
         with h5py.File(dct_ds_path, "r") as hin:
             for key in hin["DS"].keys():
                 data = hin[f"DS/{key}"][:]
-                setattr(self, key, data)
                 if data.ndim >= 3:
+                    setattr(self, key, self._to_memmap(key, data))
+                    del data
                     self._vol_keys.append(key)
+                else:
+                    setattr(self, key, data)
 
         self.shape: tuple[int, ...] = self.GIDvol.shape
         self.voxel_size: float = float(self.VoxSize[0, 0])
@@ -102,8 +110,11 @@ class DCT:
                 continue
 
             d_arr = backends.to_device(arr.astype(float) if order > 0 else arr)
-            zoomed = nd.zoom(d_arr, zoom_factors, order=order)
-            setattr(self, key, backends.to_numpy(zoomed))
+            zoomed = backends.to_numpy(nd.zoom(d_arr, zoom_factors, order=order))
+            del d_arr
+            setattr(self, key, self._to_memmap(key, zoomed))
+            del zoomed
+            gc.collect()
 
         self.voxel_size = target_vox_size
         self.shape = self.GIDvol.shape
@@ -118,7 +129,6 @@ class DCT:
             reference PCT volume.
         """
         pad_width = self._calculate_pad_width(target_shape)
-        xp = backends.xp()
 
         for key in self._vol_keys:
             arr: np.ndarray = getattr(self, key)
@@ -129,25 +139,19 @@ class DCT:
             else:
                 continue
 
-            if backends.backend_name() == "cuda":
-                padded_bytes = int(np.prod(
-                    [s + b + a for s, (b, a) in zip(arr.shape, pw)]
-                )) * arr.itemsize
-                try:
-                    import cupy as cp
-                    free = cp.cuda.Device().mem_info[0]
-                    if arr.nbytes + padded_bytes > free:
-                        raise MemoryError
-                    d_arr = backends.to_device(arr)
-                    result = backends.to_numpy(xp.pad(d_arr, pw))
-                    del d_arr
-                    cp.get_default_memory_pool().free_all_blocks()
-                except MemoryError:
-                    result = np.pad(arr, pw)
-            else:
-                result = np.pad(arr, pw)
+            padded_shape = tuple(s + b + a for s, (b, a) in zip(arr.shape, pw))
 
-            setattr(self, key, result)
+            # Write directly into a memmap — the padded array is never fully
+            # loaded into RAM; the OS pages it in/out as the slice is filled.
+            path = os.path.join(self._tmpdir.name, f"{key}.dat")
+            mm = np.memmap(path, dtype=arr.dtype, mode="w+", shape=padded_shape)
+            slices = tuple(slice(b, b + s) for (b, _), s in zip(pw, arr.shape))
+            mm[slices] = arr
+            mm.flush()
+
+            del arr
+            gc.collect()
+            setattr(self, key, mm)
 
         self.shape = self.GIDvol.shape
 
@@ -188,8 +192,11 @@ class DCT:
                 continue
 
             d_arr = backends.to_device(arr.astype(float) if order > 0 else arr)
-            shifted = nd.shift(d_arr, sv, order=order)
-            setattr(self, key, backends.to_numpy(shifted))
+            shifted = backends.to_numpy(nd.shift(d_arr, sv, order=order))
+            del d_arr
+            setattr(self, key, self._to_memmap(key, shifted))
+            del shifted
+            gc.collect()
 
         self.shape = self.GIDvol.shape
 
@@ -211,3 +218,16 @@ class DCT:
             after = diff - before
             pad_width.append((before, after))
         return tuple(pad_width)
+
+    def _to_memmap(self, key: str, arr: np.ndarray) -> np.memmap:
+        """Write *arr* to a per-key memory-mapped file and return the memmap.
+
+        The backing file lives in a temporary directory for the lifetime of
+        this object, so all 3-D volumes are paged by the OS rather than held
+        entirely in Python-managed RAM.
+        """
+        path = os.path.join(self._tmpdir.name, f"{key}.dat")
+        mm = np.memmap(path, dtype=arr.dtype, mode="w+", shape=arr.shape)
+        mm[:] = arr
+        mm.flush()
+        return mm
