@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://pedrodamas0803.github.io/multimodal-registration/guide/gpu/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>GPU Acceleration - multimodal-registration</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "GPU Acceleration";
+        var mkdocs_page_input_path = "guide/gpu.md";
+        var mkdocs_page_url = "/multimodal-registration/guide/gpu/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> multimodal-registration
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Theory</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../theory/registration/">Image Registration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../theory/deformation/">Deformation & Rotations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../theory/crystallography/">Crystal Orientations & IPF</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../workflow/">Full Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../interactive/">Interactive Registration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../export/">Exporting Data</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">GPU Acceleration</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#backend-priority">Backend priority</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#checking-the-active-backend">Checking the active backend</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#installing-cupy">Installing CuPy</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-runs-on-gpu">What runs on GPU</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#memory-considerations">Memory considerations</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../api/reference/">API Reference</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">multimodal-registration</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+      <li class="breadcrumb-item active">GPU Acceleration</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/pedrodamas0803/multimodal-registration/edit/master/docs/guide/gpu.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="gpu-acceleration">GPU Acceleration</h1>
+<p>The package detects available hardware at import time and dispatches
+compute-heavy operations to the fastest available backend.</p>
+<hr />
+<h2 id="backend-priority">Backend priority</h2>
+<pre class="highlight"><code>CUDA (CuPy)  →  CPU (NumPy / SciPy)</code></pre>
+<p>Apple MPS (Metal) does not yet expose a NumPy-compatible <code>ndimage</code> API
+suitable for zoom and shift operations, so it falls through to CPU.</p>
+<h2 id="checking-the-active-backend">Checking the active backend</h2>
+<pre class="highlight"><code class="language-python">import multimodal_registration as mr
+print(mr.backend_name())   # 'cuda' or 'cpu'</code></pre>
+<p>Or from the CLI:</p>
+<pre class="highlight"><code class="language-bash">multimodal-registration
+# multimodal-registration  [backend: cuda]</code></pre>
+<hr />
+<h2 id="installing-cupy">Installing CuPy</h2>
+<p>Pick the wheel that matches your installed CUDA toolkit:</p>
+<pre class="highlight"><code class="language-bash"># CUDA 12.x
+pip install "multimodal-registration[cuda12]"
+
+# CUDA 11.x
+pip install "multimodal-registration[cuda11]"</code></pre>
+<p>Verify that CuPy can see your GPU:</p>
+<pre class="highlight"><code class="language-python">import cupy as cp
+cp.zeros(1)          # raises if no GPU is found
+print(cp.cuda.runtime.getDeviceCount())</code></pre>
+<hr />
+<h2 id="what-runs-on-gpu">What runs on GPU</h2>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>CPU</th>
+<th>GPU</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dct.upscale()</code></td>
+<td><code>scipy.ndimage.zoom</code></td>
+<td><code>cupyx.scipy.ndimage.zoom</code></td>
+</tr>
+<tr>
+<td><code>dct.shift()</code></td>
+<td><code>scipy.ndimage.shift</code></td>
+<td><code>cupyx.scipy.ndimage.shift</code></td>
+</tr>
+<tr>
+<td><code>pct.mask</code> binary closing</td>
+<td><code>scipy.ndimage.binary_closing</code></td>
+<td><code>cupyx.scipy.ndimage.binary_closing</code></td>
+</tr>
+<tr>
+<td><code>register()</code> cross-correlation</td>
+<td><code>skimage.registration.phase_cross_correlation</code></td>
+<td><code>cucim.skimage.registration.phase_cross_correlation</code></td>
+</tr>
+</tbody>
+</table>
+<p>The deformation gradient computation (<code>numpy.gradient</code>, <code>numpy.linalg.svd</code>),
+<code>map_coordinates</code> warping, and IPF colour computation (orix) run on CPU
+regardless of backend — these are either not bottlenecks or not yet supported
+by CuPy/cuCIM.</p>
+<hr />
+<h2 id="memory-considerations">Memory considerations</h2>
+<p>Upscaling a DCT volume by a factor of ~3× in each dimension increases memory
+by ~27×.  For large datasets:</p>
+<ul>
+<li>Process one volume at a time if GPU VRAM is limited.</li>
+<li>The <code>to_device</code> / <code>to_numpy</code> helpers in <code>backends.py</code> move arrays
+  explicitly — you can stage data manually if needed.</li>
+</ul>
+<pre class="highlight"><code class="language-python">from multimodal_registration import backends
+
+d_arr = backends.to_device(my_numpy_array)   # send to GPU
+result = backends.to_numpy(d_arr)            # retrieve</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../export/" class="btn btn-neutral float-left" title="Exporting Data"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../api/reference/" class="btn btn-neutral float-right" title="API Reference">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/pedrodamas0803/multimodal-registration" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../export/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../api/reference/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../assets/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

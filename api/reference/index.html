@@ -1,0 +1,4000 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://pedrodamas0803.github.io/multimodal-registration/api/reference/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>API Reference - multimodal-registration</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "API Reference";
+        var mkdocs_page_input_path = "api/reference.md";
+        var mkdocs_page_url = "/multimodal-registration/api/reference/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> multimodal-registration
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Theory</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../theory/registration/">Image Registration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../theory/deformation/">Deformation & Rotations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../theory/crystallography/">Crystal Orientations & IPF</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../guide/workflow/">Full Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../guide/interactive/">Interactive Registration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../guide/export/">Exporting Data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../guide/gpu/">GPU Acceleration</a>
+                  </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">API Reference</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#dct">DCT</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.dct.DCT">DCT</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#multimodal_registration.dct.DCT.flip">flip</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#multimodal_registration.dct.DCT.pad">pad</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#multimodal_registration.dct.DCT.plot_ipf">plot_ipf</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#multimodal_registration.dct.DCT.shift">shift</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#multimodal_registration.dct.DCT.upscale">upscale</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#referencepct">ReferencePCT</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.pct.ReferencePCT">ReferencePCT</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#multimodal_registration.pct.ReferencePCT.plot">plot</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dvc">DVC</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.dvc.DVC">DVC</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#multimodal_registration.dvc.DVC.step">step</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#multimodal_registration.dvc.DVC.available_fields">available_fields</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#multimodal_registration.dvc.DVC.select_step">select_step</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#registration">Registration</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.registration.find_shift">find_shift</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.registration.register">register</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.registration.overlay_check">overlay_check</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#interactive">Interactive</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.interactive.ManualRegistration">ManualRegistration</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#multimodal_registration.interactive.ManualRegistration.apply">apply</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#multimodal_registration.interactive.ManualRegistration.show">show</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#deformation">Deformation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.deformation.compute_deformation_gradient">compute_deformation_gradient</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.deformation.extract_rotation_field">extract_rotation_field</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.deformation.warp_dct">warp_dct</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.deformation.update_ipf">update_ipf</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.deformation.apply_dvc">apply_dvc</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#export">Export</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.io.write">write</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.io.write_h5">write_h5</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.io.write_vtk">write_vtk</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.io.write_dream3d">write_dream3d</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#backends">Backends</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.backends.backend_name">backend_name</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.backends.to_device">to_device</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multimodal_registration.backends.to_numpy">to_numpy</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">multimodal-registration</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">API Reference</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/pedrodamas0803/multimodal-registration/edit/master/docs/api/reference.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference">API Reference</h1>
+<h2 id="dct">DCT</h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="multimodal_registration.dct.DCT" class="doc doc-heading">
+            <code>multimodal_registration.dct.DCT</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Diffraction Contrast Tomography volume.</p>
+<p>Loads all datasets stored under the <code>DS</code> group of an HDF5 file and
+exposes them as instance attributes (e.g. <code>self.GIDvol</code>, <code>self.IPF001</code>,
+<code>self.Mask</code>).  Volumetric operations (upscale, pad, shift) automatically
+use the active compute backend (CUDA if available, otherwise CPU).</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>dct_ds_path</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Path to the DCT HDF5 file.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/multimodal_registration/dct.py</code></summary>
+                <pre class="highlight"><code class="language-python">class DCT:
+    """Diffraction Contrast Tomography volume.
+
+    Loads all datasets stored under the ``DS`` group of an HDF5 file and
+    exposes them as instance attributes (e.g. ``self.GIDvol``, ``self.IPF001``,
+    ``self.Mask``).  Volumetric operations (upscale, pad, shift) automatically
+    use the active compute backend (CUDA if available, otherwise CPU).
+
+    Parameters
+    ----------
+    dct_ds_path:
+        Path to the DCT HDF5 file.
+    """
+
+    def __init__(self, dct_ds_path: str):
+        self._vol_keys: list[str] = []
+        self._tmpdir = tempfile.TemporaryDirectory()
+
+        with h5py.File(dct_ds_path, "r") as hin:
+            for key in hin["DS"].keys():
+                data = hin[f"DS/{key}"][:]
+                if data.ndim &gt;= 3:
+                    setattr(self, key, self._to_memmap(key, data))
+                    del data
+                    self._vol_keys.append(key)
+                else:
+                    setattr(self, key, data)
+
+        self.shape: tuple[int, ...] = self.GIDvol.shape
+        self.voxel_size: float = float(self.VoxSize[0, 0])
+
+    # ------------------------------------------------------------------
+    # Visualization
+    # ------------------------------------------------------------------
+
+    def plot_ipf(self, plane: str = "xz", slice_n: int | None = None):
+        """Plot a 2-D slice of the IPF001 volume.
+
+        Parameters
+        ----------
+        plane:
+            One of ``'xy'``, ``'yz'``, ``'xz'`` (and their reverses).
+        slice_n:
+            Index along the normal axis. Defaults to the mid-point.
+        """
+        plane = plane.lower()
+        axis_map = {
+            "xy": (2, lambda s: self.IPF001[:, :, s]),
+            "yx": (2, lambda s: self.IPF001[:, :, s]),
+            "yz": (1, lambda s: self.IPF001[:, s, :]),
+            "zy": (1, lambda s: self.IPF001[:, s, :]),
+            "xz": (0, lambda s: self.IPF001[s, :, :]),
+            "zx": (0, lambda s: self.IPF001[s, :, :]),
+        }
+        if plane not in axis_map:
+            raise ValueError(f"Unknown plane '{plane}'. Choose from xy, yz, xz.")
+
+        axis, slicer = axis_map[plane]
+        if slice_n is None:
+            slice_n = self.shape[axis] // 2
+
+        plt.figure()
+        plt.imshow(slicer(slice_n))
+        plt.title(f"IPF001  plane={plane}  slice={slice_n}")
+        plt.show()
+
+    # ------------------------------------------------------------------
+    # Volumetric operations
+    # ------------------------------------------------------------------
+
+    def upscale(self, target_vox_size: float) -&gt; None:
+        """Upscale all 3-D volumes in-place to match *target_vox_size*.
+
+        The zoom factor is ``self.voxel_size / target_vox_size``.
+        Integer arrays (grain IDs, masks) use nearest-neighbour
+        interpolation (``order=0``); float/RGB arrays use linear
+        interpolation (``order=1``).
+
+        Parameters
+        ----------
+        target_vox_size:
+            Voxel size of the reference volume (e.g. PCT voxel size in µm).
+        """
+        nd = backends.ndimage()
+        factor = self.voxel_size / target_vox_size
+
+        for key in self._vol_keys:
+            arr: np.ndarray = getattr(self, key)
+            order = 0 if np.issubdtype(arr.dtype, np.integer) else 1
+
+            if arr.ndim == 3:
+                zoom_factors = [factor, factor, factor]
+            elif arr.ndim == 4:
+                # Last axis is a channel (e.g. RGB colour) — do not zoom it.
+                zoom_factors = [factor, factor, factor, 1.0]
+            else:
+                continue
+
+            d_arr = backends.to_device(arr.astype(float) if order &gt; 0 else arr)
+            zoomed = backends.to_numpy(nd.zoom(d_arr, zoom_factors, order=order))
+            del d_arr
+            setattr(self, key, self._to_memmap(key, zoomed))
+            del zoomed
+            gc.collect()
+
+        self.voxel_size = target_vox_size
+        self.shape = self.GIDvol.shape
+
+    def pad(self, target_shape: tuple[int, int, int]) -&gt; None:
+        """Centre-pad all 3-D volumes in-place to *target_shape*.
+
+        Parameters
+        ----------
+        target_shape:
+            Desired ``(nx, ny, nz)`` shape, typically the shape of the
+            reference PCT volume.
+        """
+        pad_width = self._calculate_pad_width(target_shape)
+
+        for key in self._vol_keys:
+            arr: np.ndarray = getattr(self, key)
+            if arr.ndim == 3:
+                pw = pad_width
+            elif arr.ndim == 4:
+                pw = pad_width + ((0, 0),)  # leave channel axis alone
+            else:
+                continue
+
+            padded_shape = tuple(s + b + a for s, (b, a) in zip(arr.shape, pw))
+
+            # Write directly into a memmap — the padded array is never fully
+            # loaded into RAM; the OS pages it in/out as the slice is filled.
+            path = os.path.join(self._tmpdir.name, f"{key}.dat")
+            mm = np.memmap(path, dtype=arr.dtype, mode="w+", shape=padded_shape)
+            slices = tuple(slice(b, b + s) for (b, _), s in zip(pw, arr.shape))
+            mm[slices] = arr
+            mm.flush()
+
+            del arr
+            gc.collect()
+            setattr(self, key, mm)
+
+        self.shape = self.GIDvol.shape
+
+    def flip(self, axis: int = 0) -&gt; None:
+        """Flip all 3-D volumes in-place along *axis*.
+
+        Parameters
+        ----------
+        axis:
+            Spatial axis to flip (0, 1, or 2). Default is 0 (vertical).
+        """
+        for key in self._vol_keys:
+            arr: np.ndarray = getattr(self, key)
+            setattr(self, key, np.flip(arr, axis=axis).copy())
+
+    def shift(self, shifts: tuple[float, float, float]) -&gt; None:
+        """Shift all 3-D volumes in-place by *shifts* voxels.
+
+        Integer arrays are shifted with nearest-neighbour interpolation
+        (``order=0``); float arrays use linear interpolation (``order=1``).
+
+        Parameters
+        ----------
+        shifts:
+            ``(dx, dy, dz)`` shift in voxels along each axis.
+        """
+        nd = backends.ndimage()
+
+        for key in self._vol_keys:
+            arr: np.ndarray = getattr(self, key)
+            order = 0 if np.issubdtype(arr.dtype, np.integer) else 1
+
+            if arr.ndim == 3:
+                sv = list(shifts)
+            elif arr.ndim == 4:
+                sv = list(shifts) + [0.0]
+            else:
+                continue
+
+            d_arr = backends.to_device(arr.astype(float) if order &gt; 0 else arr)
+            shifted = backends.to_numpy(nd.shift(d_arr, sv, order=order))
+            del d_arr
+            setattr(self, key, self._to_memmap(key, shifted))
+            del shifted
+            gc.collect()
+
+        self.shape = self.GIDvol.shape
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    def _calculate_pad_width(
+        self, target_shape: tuple[int, int, int]
+    ) -&gt; tuple[tuple[int, int], ...]:
+        """Return ``((before, after), ...)`` padding for each spatial axis.
+
+        Padding is symmetric; any extra pixel goes to the *after* side.
+        """
+        pad_width = []
+        for current, target in zip(self.shape, target_shape):
+            diff = target - current
+            before = diff // 2
+            after = diff - before
+            pad_width.append((before, after))
+        return tuple(pad_width)
+
+    def _to_memmap(self, key: str, arr: np.ndarray) -&gt; np.memmap:
+        """Write *arr* to a per-key memory-mapped file and return the memmap.
+
+        The backing file lives in a temporary directory for the lifetime of
+        this object, so all 3-D volumes are paged by the OS rather than held
+        entirely in Python-managed RAM.
+        """
+        path = os.path.join(self._tmpdir.name, f"{key}.dat")
+        mm = np.memmap(path, dtype=arr.dtype, mode="w+", shape=arr.shape)
+        mm[:] = arr
+        mm.flush()
+        return mm</code></pre>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="multimodal_registration.dct.DCT.flip" class="doc doc-heading">
+            <code class="highlight language-python">flip(axis=0)</code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Flip all 3-D volumes in-place along <em>axis</em>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>axis</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code>0</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Spatial axis to flip (0, 1, or 2). Default is 0 (vertical).</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/dct.py</code></summary>
+              <pre class="highlight"><code class="language-python">def flip(self, axis: int = 0) -&gt; None:
+    """Flip all 3-D volumes in-place along *axis*.
+
+    Parameters
+    ----------
+    axis:
+        Spatial axis to flip (0, 1, or 2). Default is 0 (vertical).
+    """
+    for key in self._vol_keys:
+        arr: np.ndarray = getattr(self, key)
+        setattr(self, key, np.flip(arr, axis=axis).copy())</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="multimodal_registration.dct.DCT.pad" class="doc doc-heading">
+            <code class="highlight language-python">pad(target_shape)</code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Centre-pad all 3-D volumes in-place to <em>target_shape</em>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>target_shape</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="int">int</span>, <span title="int">int</span>, <span title="int">int</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Desired <code>(nx, ny, nz)</code> shape, typically the shape of the
+reference PCT volume.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/dct.py</code></summary>
+              <pre class="highlight"><code class="language-python">def pad(self, target_shape: tuple[int, int, int]) -&gt; None:
+    """Centre-pad all 3-D volumes in-place to *target_shape*.
+
+    Parameters
+    ----------
+    target_shape:
+        Desired ``(nx, ny, nz)`` shape, typically the shape of the
+        reference PCT volume.
+    """
+    pad_width = self._calculate_pad_width(target_shape)
+
+    for key in self._vol_keys:
+        arr: np.ndarray = getattr(self, key)
+        if arr.ndim == 3:
+            pw = pad_width
+        elif arr.ndim == 4:
+            pw = pad_width + ((0, 0),)  # leave channel axis alone
+        else:
+            continue
+
+        padded_shape = tuple(s + b + a for s, (b, a) in zip(arr.shape, pw))
+
+        # Write directly into a memmap — the padded array is never fully
+        # loaded into RAM; the OS pages it in/out as the slice is filled.
+        path = os.path.join(self._tmpdir.name, f"{key}.dat")
+        mm = np.memmap(path, dtype=arr.dtype, mode="w+", shape=padded_shape)
+        slices = tuple(slice(b, b + s) for (b, _), s in zip(pw, arr.shape))
+        mm[slices] = arr
+        mm.flush()
+
+        del arr
+        gc.collect()
+        setattr(self, key, mm)
+
+    self.shape = self.GIDvol.shape</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="multimodal_registration.dct.DCT.plot_ipf" class="doc doc-heading">
+            <code class="highlight language-python">plot_ipf(plane='xz', slice_n=None)</code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Plot a 2-D slice of the IPF001 volume.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>plane</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;xz&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>One of <code>'xy'</code>, <code>'yz'</code>, <code>'xz'</code> (and their reverses).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>slice_n</code></b>
+                  (<code><span title="int">int</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Index along the normal axis. Defaults to the mid-point.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/dct.py</code></summary>
+              <pre class="highlight"><code class="language-python">def plot_ipf(self, plane: str = "xz", slice_n: int | None = None):
+    """Plot a 2-D slice of the IPF001 volume.
+
+    Parameters
+    ----------
+    plane:
+        One of ``'xy'``, ``'yz'``, ``'xz'`` (and their reverses).
+    slice_n:
+        Index along the normal axis. Defaults to the mid-point.
+    """
+    plane = plane.lower()
+    axis_map = {
+        "xy": (2, lambda s: self.IPF001[:, :, s]),
+        "yx": (2, lambda s: self.IPF001[:, :, s]),
+        "yz": (1, lambda s: self.IPF001[:, s, :]),
+        "zy": (1, lambda s: self.IPF001[:, s, :]),
+        "xz": (0, lambda s: self.IPF001[s, :, :]),
+        "zx": (0, lambda s: self.IPF001[s, :, :]),
+    }
+    if plane not in axis_map:
+        raise ValueError(f"Unknown plane '{plane}'. Choose from xy, yz, xz.")
+
+    axis, slicer = axis_map[plane]
+    if slice_n is None:
+        slice_n = self.shape[axis] // 2
+
+    plt.figure()
+    plt.imshow(slicer(slice_n))
+    plt.title(f"IPF001  plane={plane}  slice={slice_n}")
+    plt.show()</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="multimodal_registration.dct.DCT.shift" class="doc doc-heading">
+            <code class="highlight language-python">shift(shifts)</code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Shift all 3-D volumes in-place by <em>shifts</em> voxels.</p>
+<p>Integer arrays are shifted with nearest-neighbour interpolation
+(<code>order=0</code>); float arrays use linear interpolation (<code>order=1</code>).</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>shifts</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="float">float</span>, <span title="float">float</span>, <span title="float">float</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p><code>(dx, dy, dz)</code> shift in voxels along each axis.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/dct.py</code></summary>
+              <pre class="highlight"><code class="language-python">def shift(self, shifts: tuple[float, float, float]) -&gt; None:
+    """Shift all 3-D volumes in-place by *shifts* voxels.
+
+    Integer arrays are shifted with nearest-neighbour interpolation
+    (``order=0``); float arrays use linear interpolation (``order=1``).
+
+    Parameters
+    ----------
+    shifts:
+        ``(dx, dy, dz)`` shift in voxels along each axis.
+    """
+    nd = backends.ndimage()
+
+    for key in self._vol_keys:
+        arr: np.ndarray = getattr(self, key)
+        order = 0 if np.issubdtype(arr.dtype, np.integer) else 1
+
+        if arr.ndim == 3:
+            sv = list(shifts)
+        elif arr.ndim == 4:
+            sv = list(shifts) + [0.0]
+        else:
+            continue
+
+        d_arr = backends.to_device(arr.astype(float) if order &gt; 0 else arr)
+        shifted = backends.to_numpy(nd.shift(d_arr, sv, order=order))
+        del d_arr
+        setattr(self, key, self._to_memmap(key, shifted))
+        del shifted
+        gc.collect()
+
+    self.shape = self.GIDvol.shape</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="multimodal_registration.dct.DCT.upscale" class="doc doc-heading">
+            <code class="highlight language-python">upscale(target_vox_size)</code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Upscale all 3-D volumes in-place to match <em>target_vox_size</em>.</p>
+<p>The zoom factor is <code>self.voxel_size / target_vox_size</code>.
+Integer arrays (grain IDs, masks) use nearest-neighbour
+interpolation (<code>order=0</code>); float/RGB arrays use linear
+interpolation (<code>order=1</code>).</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>target_vox_size</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Voxel size of the reference volume (e.g. PCT voxel size in µm).</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/dct.py</code></summary>
+              <pre class="highlight"><code class="language-python">def upscale(self, target_vox_size: float) -&gt; None:
+    """Upscale all 3-D volumes in-place to match *target_vox_size*.
+
+    The zoom factor is ``self.voxel_size / target_vox_size``.
+    Integer arrays (grain IDs, masks) use nearest-neighbour
+    interpolation (``order=0``); float/RGB arrays use linear
+    interpolation (``order=1``).
+
+    Parameters
+    ----------
+    target_vox_size:
+        Voxel size of the reference volume (e.g. PCT voxel size in µm).
+    """
+    nd = backends.ndimage()
+    factor = self.voxel_size / target_vox_size
+
+    for key in self._vol_keys:
+        arr: np.ndarray = getattr(self, key)
+        order = 0 if np.issubdtype(arr.dtype, np.integer) else 1
+
+        if arr.ndim == 3:
+            zoom_factors = [factor, factor, factor]
+        elif arr.ndim == 4:
+            # Last axis is a channel (e.g. RGB colour) — do not zoom it.
+            zoom_factors = [factor, factor, factor, 1.0]
+        else:
+            continue
+
+        d_arr = backends.to_device(arr.astype(float) if order &gt; 0 else arr)
+        zoomed = backends.to_numpy(nd.zoom(d_arr, zoom_factors, order=order))
+        del d_arr
+        setattr(self, key, self._to_memmap(key, zoomed))
+        del zoomed
+        gc.collect()
+
+    self.voxel_size = target_vox_size
+    self.shape = self.GIDvol.shape</code></pre>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div><hr />
+<h2 id="referencepct">ReferencePCT</h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="multimodal_registration.pct.ReferencePCT" class="doc doc-heading">
+            <code>multimodal_registration.pct.ReferencePCT</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Phase Contrast Tomography reference volume.</p>
+<p>Supports TIFF/TIF and HDF5 file formats.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>pct_ref_path</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Path to the PCT volume file.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>h5_key</code></b>
+                  (<code><span title="str">str</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Dataset key inside the HDF5 file. Required when the file is HDF5.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>closing_radius</code></b>
+                  (<code><span title="int">int</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>If given, apply a spherical binary closing with this radius (in
+voxels) to the Otsu mask. Useful for filling internal holes before
+registration. GPU-accelerated when CUDA is available.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/multimodal_registration/pct.py</code></summary>
+                <pre class="highlight"><code class="language-python">class ReferencePCT:
+    """Phase Contrast Tomography reference volume.
+
+    Supports TIFF/TIF and HDF5 file formats.
+
+    Parameters
+    ----------
+    pct_ref_path:
+        Path to the PCT volume file.
+    h5_key:
+        Dataset key inside the HDF5 file. Required when the file is HDF5.
+    closing_radius:
+        If given, apply a spherical binary closing with this radius (in
+        voxels) to the Otsu mask. Useful for filling internal holes before
+        registration. GPU-accelerated when CUDA is available.
+    """
+
+    def __init__(
+        self,
+        pct_ref_path: str,
+        h5_key: str | None = None,
+        closing_radius: int | None = None,
+    ):
+        self.path = pct_ref_path
+        self.im_format = get_extension(self.path)
+        self.h5_key = h5_key
+
+        if self.im_format in ("h5", "hdf5") and self.h5_key is None:
+            raise ValueError(
+                "Please provide an h5_key to load your volume from an HDF5 file."
+            )
+
+        self.vol: np.ndarray = self._load_volume()
+        self.shape: tuple[int, ...] = self.vol.shape
+        self.mask: np.ndarray = self._compute_mask(closing_radius)
+
+    def _compute_mask(self, closing_radius: int | None) -&gt; np.ndarray:
+        mask = self.vol &gt; threshold_otsu(self.vol)
+        if closing_radius is None:
+            return mask
+
+        nd = backends.ndimage()
+        r = closing_radius
+        # Build a spherical structuring element
+        grid = np.ogrid[-r : r + 1, -r : r + 1, -r : r + 1]
+        struct = (grid[0] ** 2 + grid[1] ** 2 + grid[2] ** 2) &lt;= r**2
+
+        d_mask = backends.to_device(mask)
+        d_struct = backends.to_device(struct)
+        closed = nd.binary_closing(d_mask, structure=d_struct)
+        return backends.to_numpy(closed)
+
+    def _load_volume(self) -&gt; np.ndarray:
+        if self.im_format in ("tiff", "tif"):
+            try:
+                return sk.io.imread(self.path)
+            except FileNotFoundError as e:
+                raise FileNotFoundError(f"PCT file not found: {self.path}") from e
+
+        if self.im_format in ("h5", "hdf5"):
+            try:
+                with h5py.File(self.path, "r") as hin:
+                    return hin[self.h5_key][:]
+            except FileNotFoundError as e:
+                raise FileNotFoundError(f"PCT file not found: {self.path}") from e
+
+        raise ValueError(
+            f"Unsupported format '{self.im_format}'. Expected tiff, tif, h5, or hdf5."
+        )
+
+    def plot(self, plane: str = "xz", slice_n: int | None = None):
+        """Plot a 2-D slice of the PCT volume.
+
+        Parameters
+        ----------
+        plane:
+            One of ``'xy'``, ``'yz'``, ``'xz'`` (and their reverses).
+        slice_n:
+            Index along the normal axis. Defaults to the mid-point.
+        """
+        plane = plane.lower()
+        axis_map = {
+            "xy": (2, lambda s: self.vol[:, :, s]),
+            "yx": (2, lambda s: self.vol[:, :, s]),
+            "yz": (1, lambda s: self.vol[:, s, :]),
+            "zy": (1, lambda s: self.vol[:, s, :]),
+            "xz": (0, lambda s: self.vol[s, :, :]),
+            "zx": (0, lambda s: self.vol[s, :, :]),
+        }
+        if plane not in axis_map:
+            raise ValueError(f"Unknown plane '{plane}'. Choose from xy, yz, xz.")
+
+        axis, slicer = axis_map[plane]
+        if slice_n is None:
+            slice_n = self.shape[axis] // 2
+
+        plt.figure()
+        plt.imshow(slicer(slice_n), cmap="gray")
+        plt.title(f"PCT  plane={plane}  slice={slice_n}")
+        plt.show()</code></pre>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="multimodal_registration.pct.ReferencePCT.plot" class="doc doc-heading">
+            <code class="highlight language-python">plot(plane='xz', slice_n=None)</code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Plot a 2-D slice of the PCT volume.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>plane</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;xz&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>One of <code>'xy'</code>, <code>'yz'</code>, <code>'xz'</code> (and their reverses).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>slice_n</code></b>
+                  (<code><span title="int">int</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Index along the normal axis. Defaults to the mid-point.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/pct.py</code></summary>
+              <pre class="highlight"><code class="language-python">def plot(self, plane: str = "xz", slice_n: int | None = None):
+    """Plot a 2-D slice of the PCT volume.
+
+    Parameters
+    ----------
+    plane:
+        One of ``'xy'``, ``'yz'``, ``'xz'`` (and their reverses).
+    slice_n:
+        Index along the normal axis. Defaults to the mid-point.
+    """
+    plane = plane.lower()
+    axis_map = {
+        "xy": (2, lambda s: self.vol[:, :, s]),
+        "yx": (2, lambda s: self.vol[:, :, s]),
+        "yz": (1, lambda s: self.vol[:, s, :]),
+        "zy": (1, lambda s: self.vol[:, s, :]),
+        "xz": (0, lambda s: self.vol[s, :, :]),
+        "zx": (0, lambda s: self.vol[s, :, :]),
+    }
+    if plane not in axis_map:
+        raise ValueError(f"Unknown plane '{plane}'. Choose from xy, yz, xz.")
+
+    axis, slicer = axis_map[plane]
+    if slice_n is None:
+        slice_n = self.shape[axis] // 2
+
+    plt.figure()
+    plt.imshow(slicer(slice_n), cmap="gray")
+    plt.title(f"PCT  plane={plane}  slice={slice_n}")
+    plt.show()</code></pre>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div><hr />
+<h2 id="dvc">DVC</h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="multimodal_registration.dvc.DVC" class="doc doc-heading">
+            <code>multimodal_registration.dvc.DVC</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>DVC result volume, with optional multi-step support.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>path</code></b>
+                  (<code><span title="str">str</span> | <span title="list">list</span>[<span title="str">str</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Path (or list of paths for multi-step VTK) to the DVC result file.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>displacement_key</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;displacement&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Field / dataset name for the displacement array (default
+<code>'displacement'</code> for VTK, <code>'U'</code> for HDF5).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>strain_keys</code></b>
+                  (<code><span title="list">list</span>[<span title="str">str</span>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Field names to load as strain data (<em>VTK only</em>).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>step_keys</code></b>
+                  (<code><span title="list">list</span>[<span title="str">str</span>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p><em>HDF5/MAT multi-group only.</em> List of HDF5 group names, one per
+loading step.  The displacement is read from
+<code>&lt;step_key&gt;/&lt;displacement_key&gt;</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>step</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code>-1</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Initial active step index (0-based).  Negative values count from
+the end (default <code>-1</code> → last step).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>origin_key</code></b>
+                  (<code><span title="str">str</span> | None</code>, default:
+                      <code>&#39;origin&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p><em>HDF5/MAT only.</em> Dataset key for the ROI origin array.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>spacing_key</code></b>
+                  (<code><span title="str">str</span> | None</code>, default:
+                      <code>&#39;spacing&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p><em>HDF5/MAT only.</em> Dataset key for the grid spacing array.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>origin</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="float">float</span>, <span title="float">float</span>, <span title="float">float</span>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Explicit ROI origin <code>(x0, y0, z0)</code> in PCT voxel coordinates.
+Overrides <em>origin_key</em>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>spacing</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="float">float</span>, <span title="float">float</span>, <span title="float">float</span>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Explicit grid spacing <code>(dx, dy, dz)</code> in voxels.
+Overrides <em>spacing_key</em>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/multimodal_registration/dvc.py</code></summary>
+                <pre class="highlight"><code class="language-python">class DVC:
+    """DVC result volume, with optional multi-step support.
+
+    Parameters
+    ----------
+    path:
+        Path (or list of paths for multi-step VTK) to the DVC result file.
+    displacement_key:
+        Field / dataset name for the displacement array (default
+        ``'displacement'`` for VTK, ``'U'`` for HDF5).
+    strain_keys:
+        Field names to load as strain data (*VTK only*).
+    step_keys:
+        *HDF5/MAT multi-group only.* List of HDF5 group names, one per
+        loading step.  The displacement is read from
+        ``&lt;step_key&gt;/&lt;displacement_key&gt;``.
+    step:
+        Initial active step index (0-based).  Negative values count from
+        the end (default ``-1`` → last step).
+    origin_key:
+        *HDF5/MAT only.* Dataset key for the ROI origin array.
+    spacing_key:
+        *HDF5/MAT only.* Dataset key for the grid spacing array.
+    origin:
+        Explicit ROI origin ``(x0, y0, z0)`` in PCT voxel coordinates.
+        Overrides *origin_key*.
+    spacing:
+        Explicit grid spacing ``(dx, dy, dz)`` in voxels.
+        Overrides *spacing_key*.
+    """
+
+    _VTK_EXTENSIONS = {"vtk", "vts", "vtu", "vtr", "vtm"}
+    _H5_EXTENSIONS  = {"mat", "h5", "hdf5", "res"}
+
+    def __init__(
+        self,
+        path: str | list[str],
+        displacement_key: str = "displacement",
+        strain_keys: list[str] | None = None,
+        step_keys: list[str] | None = None,
+        step: int = -1,
+        origin_key: str | None = "origin",
+        spacing_key: str | None = "spacing",
+        origin: tuple[float, float, float] | None = None,
+        spacing: tuple[float, float, float] | None = None,
+    ):
+        # --- store loader configuration ------------------------------------
+        self._displacement_key = displacement_key
+        self._strain_keys      = strain_keys
+        self._origin_key       = origin_key
+        self._spacing_key      = spacing_key
+        self._origin_override  = origin
+        self._spacing_override = spacing
+
+        self.strain: dict[str, np.ndarray] = {}
+        self.origin:  tuple[float, float, float] = (0.0, 0.0, 0.0)
+        self.spacing: tuple[float, float, float] = (1.0, 1.0, 1.0)
+
+        # --- detect mode ---------------------------------------------------
+        if isinstance(path, list):
+            self._mode   = "vtk_multi"
+            self._paths  = path
+            self.path    = path[0]
+            self.fmt     = get_extension(self.path)
+            self.n_steps = len(path)
+            # Read geometry once from the first file
+            self._read_vtk_geometry(self.path)
+
+        else:
+            self.path = path
+            self.fmt  = get_extension(path)
+
+            if self.fmt in self._VTK_EXTENSIONS:
+                self._mode   = "vtk_single"
+                self.n_steps = 1
+
+            elif self.fmt in self._H5_EXTENSIONS:
+                if step_keys is not None:
+                    self._mode      = "h5_group"
+                    self._step_keys = step_keys
+                    self.n_steps    = len(step_keys)
+                else:
+                    # Peek at the array shape to detect 5-D layout
+                    self._mode, self.n_steps = self._probe_h5(
+                        path, displacement_key)
+            else:
+                raise ValueError(
+                    f"Unsupported format '{self.fmt}'. "
+                    f"Expected one of: "
+                    f"{self._VTK_EXTENSIONS | self._H5_EXTENSIONS}."
+                )
+
+        # --- resolve initial step index ------------------------------------
+        self._step = step if step &gt;= 0 else self.n_steps + step
+        if not 0 &lt;= self._step &lt; self.n_steps:
+            raise IndexError(
+                f"step={step} out of range for n_steps={self.n_steps}."
+            )
+
+        # --- load active step ----------------------------------------------
+        self._load_step(self._step)
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    @property
+    def step(self) -&gt; int:
+        """Currently active step index (0-based)."""
+        return self._step
+
+    def select_step(self, step: int) -&gt; None:
+        """Switch to a different loading step and reload the displacement.
+
+        Parameters
+        ----------
+        step:
+            Step index (0-based).  Negative values count from the end.
+        """
+        if step &lt; 0:
+            step = self.n_steps + step
+        if not 0 &lt;= step &lt; self.n_steps:
+            raise IndexError(
+                f"step={step} out of range for n_steps={self.n_steps}."
+            )
+        self._step = step
+        self._load_step(step)
+
+    def available_fields(self) -&gt; list[str]:
+        """Return all point- and cell-data field names in a VTK file.
+
+        Useful for discovering field names before loading.  Returns an
+        empty list for HDF5/MAT files (use an HDF5 browser instead).
+        """
+        if self.fmt not in self._VTK_EXTENSIONS:
+            return []
+        try:
+            import pyvista as pv
+        except ImportError:
+            return []
+        mesh = pv.read(self.path)
+        return list(mesh.point_data.keys()) + list(mesh.cell_data.keys())
+
+    def __repr__(self) -&gt; str:
+        return (
+            f"DVC(n_steps={self.n_steps}, step={self._step}, "
+            f"shape={self.shape}, spacing={self.spacing})"
+        )
+
+    # ------------------------------------------------------------------
+    # Step loader dispatcher
+    # ------------------------------------------------------------------
+
+    def _load_step(self, step: int) -&gt; None:
+        if self._mode == "vtk_single":
+            self._load_vtk(self.path)
+
+        elif self._mode == "vtk_multi":
+            self._load_vtk(self._paths[step])
+
+        elif self._mode == "h5_single":
+            self._load_h5(self.path, self._displacement_key)
+
+        elif self._mode == "h5_5d":
+            self._load_h5_5d(step)
+
+        elif self._mode == "h5_group":
+            key = self._step_keys[step]
+            full_key = f"{key}/{self._displacement_key}"
+            self._load_h5(self.path, full_key)
+
+        self.shape: tuple[int, ...] = self.displacement.shape[:3]
+
+    # ------------------------------------------------------------------
+    # VTK loaders
+    # ------------------------------------------------------------------
+
+    def _read_vtk_geometry(self, path: str) -&gt; None:
+        """Read origin and spacing from a VTK file without loading fields."""
+        try:
+            import pyvista as pv
+        except ImportError as e:
+            raise ImportError(
+                "pyvista is required to load VTK files: pip install pyvista"
+            ) from e
+        mesh = pv.read(path)
+        self._set_geometry_from_vtk(mesh)
+
+    def _load_vtk(self, path: str) -&gt; None:
+        try:
+            import pyvista as pv
+        except ImportError as e:
+            raise ImportError(
+                "pyvista is required to load VTK files: pip install pyvista"
+            ) from e
+
+        mesh = pv.read(path)
+        self._set_geometry_from_vtk(mesh)
+        dims = _vtk_dims(mesh)
+
+        self.displacement = _extract_field(
+            mesh, self._displacement_key, dims, components=3)
+
+        self.strain = {}
+        if self._strain_keys:
+            for key in self._strain_keys:
+                try:
+                    n_comp = _field_n_components(mesh, key)
+                    self.strain[key] = _extract_field(mesh, key, dims,
+                                                      components=n_comp)
+                except KeyError:
+                    warnings.warn(f"Strain field '{key}' not found in {path}.")
+
+    def _set_geometry_from_vtk(self, mesh) -&gt; None:
+        if hasattr(mesh, "origin") and hasattr(mesh, "spacing"):
+            self.origin  = tuple(float(v) for v in mesh.origin)
+            self.spacing = tuple(float(v) for v in mesh.spacing)
+        elif hasattr(mesh, "bounds"):
+            b = mesh.bounds
+            self.origin  = (float(b[0]), float(b[2]), float(b[4]))
+            self.spacing = (1.0, 1.0, 1.0)
+
+    # ------------------------------------------------------------------
+    # HDF5 loaders
+    # ------------------------------------------------------------------
+
+    def _probe_h5(self, path: str, key: str) -&gt; tuple[str, int]:
+        """Determine HDF5 mode and n_steps without loading the full array."""
+        import h5py
+
+        with h5py.File(path, "r") as f:
+            shape = f[key].shape
+
+        if len(shape) == 5:                   # (n_steps, nx, ny, nz, 3)
+            import h5py
+            with h5py.File(path, "r") as f:
+                self._h5_all_steps = f[key][:]   # load once; fits in RAM
+            self._read_h5_geometry(path)
+            return "h5_5d", shape[0]
+
+        self._read_h5_geometry(path)
+        return "h5_single", 1
+
+    def _read_h5_geometry(self, path: str) -&gt; None:
+        import h5py
+
+        with h5py.File(path, "r") as f:
+            if self._origin_override is not None:
+                self.origin = tuple(float(v) for v in self._origin_override)
+            elif self._origin_key and self._origin_key in f:
+                self.origin = tuple(float(v) for v in f[self._origin_key][:])
+
+            if self._spacing_override is not None:
+                self.spacing = tuple(float(v) for v in self._spacing_override)
+            elif self._spacing_key and self._spacing_key in f:
+                self.spacing = tuple(float(v) for v in f[self._spacing_key][:])
+
+    def _load_h5(self, path: str, displacement_key: str) -&gt; None:
+        import h5py
+
+        with h5py.File(path, "r") as f:
+            self.displacement = f[displacement_key][:]
+            self._read_h5_geometry(path)
+
+    def _load_h5_5d(self, step: int) -&gt; None:
+        self.displacement = self._h5_all_steps[step]</code></pre>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="multimodal_registration.dvc.DVC.step" class="doc doc-heading">
+            <code class="highlight language-python">step</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Currently active step index (0-based).</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="multimodal_registration.dvc.DVC.available_fields" class="doc doc-heading">
+            <code class="highlight language-python">available_fields()</code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return all point- and cell-data field names in a VTK file.</p>
+<p>Useful for discovering field names before loading.  Returns an
+empty list for HDF5/MAT files (use an HDF5 browser instead).</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/dvc.py</code></summary>
+              <pre class="highlight"><code class="language-python">def available_fields(self) -&gt; list[str]:
+    """Return all point- and cell-data field names in a VTK file.
+
+    Useful for discovering field names before loading.  Returns an
+    empty list for HDF5/MAT files (use an HDF5 browser instead).
+    """
+    if self.fmt not in self._VTK_EXTENSIONS:
+        return []
+    try:
+        import pyvista as pv
+    except ImportError:
+        return []
+    mesh = pv.read(self.path)
+    return list(mesh.point_data.keys()) + list(mesh.cell_data.keys())</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="multimodal_registration.dvc.DVC.select_step" class="doc doc-heading">
+            <code class="highlight language-python">select_step(step)</code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Switch to a different loading step and reload the displacement.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>step</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Step index (0-based).  Negative values count from the end.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/dvc.py</code></summary>
+              <pre class="highlight"><code class="language-python">def select_step(self, step: int) -&gt; None:
+    """Switch to a different loading step and reload the displacement.
+
+    Parameters
+    ----------
+    step:
+        Step index (0-based).  Negative values count from the end.
+    """
+    if step &lt; 0:
+        step = self.n_steps + step
+    if not 0 &lt;= step &lt; self.n_steps:
+        raise IndexError(
+            f"step={step} out of range for n_steps={self.n_steps}."
+        )
+    self._step = step
+    self._load_step(step)</code></pre>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div><hr />
+<h2 id="registration">Registration</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.registration.find_shift" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.registration.find_shift(fixed, moving, upsample_factor=10)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Estimate the translation that aligns <em>moving</em> to <em>fixed</em>.</p>
+<p>Uses phase cross-correlation (Fourier-domain normalised
+cross-power spectrum), which is robust to intensity differences
+between modalities.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>fixed</code></b>
+                  (<code><span title="numpy.ndarray">ndarray</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Reference array (e.g. PCT volume or a derived binary mask).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>moving</code></b>
+                  (<code><span title="numpy.ndarray">ndarray</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Array to register (e.g. DCT mask after upscaling and padding).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>upsample_factor</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code>10</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Sub-pixel precision: a value of 10 gives 0.1-voxel accuracy.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+<b><code>shift</code></b>(                  <code>(<span title="ndarray">ndarray</span>, <span title="shape">shape</span>(<span title="ndim">ndim</span>))</code>
+)              –
+              <div class="doc-md-description">
+                <p>Translation in voxels that must be applied to <em>moving</em> to align it
+with <em>fixed</em> (positive = shift right/down).</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/registration.py</code></summary>
+              <pre class="highlight"><code class="language-python">def find_shift(
+    fixed: np.ndarray,
+    moving: np.ndarray,
+    upsample_factor: int = 10,
+) -&gt; np.ndarray:
+    """Estimate the translation that aligns *moving* to *fixed*.
+
+    Uses phase cross-correlation (Fourier-domain normalised
+    cross-power spectrum), which is robust to intensity differences
+    between modalities.
+
+    Parameters
+    ----------
+    fixed:
+        Reference array (e.g. PCT volume or a derived binary mask).
+    moving:
+        Array to register (e.g. DCT mask after upscaling and padding).
+    upsample_factor:
+        Sub-pixel precision: a value of 10 gives 0.1-voxel accuracy.
+
+    Returns
+    -------
+    shift : ndarray, shape (ndim,)
+        Translation in voxels that must be applied to *moving* to align it
+        with *fixed* (positive = shift right/down).
+    """
+    try:
+        if backends.backend_name() == "cuda":
+            from cucim.skimage.registration import phase_cross_correlation
+        else:
+            from skimage.registration import phase_cross_correlation
+    except ImportError:
+        from skimage.registration import phase_cross_correlation
+
+    shift, _, _ = phase_cross_correlation(
+        fixed.astype(float),
+        moving.astype(float),
+        upsample_factor=upsample_factor,
+    )
+    return shift</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.registration.register" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.registration.register(dct, pct, dct_field='Mask', pct_field='mask', upsample_factor=10)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>High-level registration: find the translation between a DCT field and
+the PCT volume, apply it to <strong>all</strong> DCT volumes, and return the shift.</p>
+
+
+<details class="prerequisites" open>
+  <summary>Prerequisites</summary>
+  <p>Call <code>dct.upscale(pct.voxel_size)</code> and <code>dct.pad(pct.shape)</code> before
+calling this function so that the DCT and PCT arrays share the same
+shape and voxel size.</p>
+</details>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>dct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dct.DCT" href="#multimodal_registration.dct.DCT">DCT</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>DCT object (already upscaled and padded to PCT frame).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.pct.ReferencePCT" href="#multimodal_registration.pct.ReferencePCT">ReferencePCT</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>PCT reference object.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dct_field</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;Mask&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Attribute name on <em>dct</em> used as the moving image (default <code>'Mask'</code>).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pct_field</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;mask&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Attribute name on <em>pct</em> used as the fixed image.  Defaults to
+<code>pct.mask</code> (Otsu-thresholded binary mask).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>upsample_factor</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code>10</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Sub-pixel accuracy passed to :func:<code>find_shift</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+<b><code>shift</code></b>(                  <code>(<span title="ndarray">ndarray</span>, <span title="shape">shape</span>(3))</code>
+)              –
+              <div class="doc-md-description">
+                <p>Applied translation in voxels.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/registration.py</code></summary>
+              <pre class="highlight"><code class="language-python">def register(
+    dct: DCT,
+    pct: ReferencePCT,
+    dct_field: str = "Mask",
+    pct_field: str = "mask",
+    upsample_factor: int = 10,
+) -&gt; np.ndarray:
+    """High-level registration: find the translation between a DCT field and
+    the PCT volume, apply it to **all** DCT volumes, and return the shift.
+
+    Prerequisites
+    -------------
+    Call ``dct.upscale(pct.voxel_size)`` and ``dct.pad(pct.shape)`` before
+    calling this function so that the DCT and PCT arrays share the same
+    shape and voxel size.
+
+    Parameters
+    ----------
+    dct:
+        DCT object (already upscaled and padded to PCT frame).
+    pct:
+        PCT reference object.
+    dct_field:
+        Attribute name on *dct* used as the moving image (default ``'Mask'``).
+    pct_field:
+        Attribute name on *pct* used as the fixed image.  Defaults to
+        ``pct.mask`` (Otsu-thresholded binary mask).
+    upsample_factor:
+        Sub-pixel accuracy passed to :func:`find_shift`.
+
+    Returns
+    -------
+    shift : ndarray, shape (3,)
+        Applied translation in voxels.
+    """
+    fixed = getattr(pct, pct_field)
+    moving = getattr(dct, dct_field)
+
+    shift = find_shift(fixed, moving, upsample_factor=upsample_factor)
+    dct.shift(tuple(shift.tolist()))
+    return shift</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.registration.overlay_check" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.registration.overlay_check(dct, pct, dct_field='Mask', plane='xz', slice_n=None, alpha=0.5)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Quick visual check: overlay a DCT field with the PCT volume.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>dct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dct.DCT" href="#multimodal_registration.dct.DCT">DCT</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>DCT object (upscaled, padded, and shifted to PCT frame).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.pct.ReferencePCT" href="#multimodal_registration.pct.ReferencePCT">ReferencePCT</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>PCT reference object.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dct_field</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;Mask&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Attribute name on <em>dct</em> to overlay (default <code>'Mask'</code>).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>plane</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;xz&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Slice plane (<code>'xy'</code>, <code>'yz'</code>, or <code>'xz'</code>).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>slice_n</code></b>
+                  (<code><span title="int">int</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Slice index. Defaults to mid-point.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>alpha</code></b>
+                  (<code><span title="float">float</span></code>, default:
+                      <code>0.5</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Opacity of the DCT overlay (0–1).</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/registration.py</code></summary>
+              <pre class="highlight"><code class="language-python">def overlay_check(
+    dct: DCT,
+    pct: ReferencePCT,
+    dct_field: str = "Mask",
+    plane: str = "xz",
+    slice_n: int | None = None,
+    alpha: float = 0.5,
+):
+    """Quick visual check: overlay a DCT field with the PCT volume.
+
+    Parameters
+    ----------
+    dct:
+        DCT object (upscaled, padded, and shifted to PCT frame).
+    pct:
+        PCT reference object.
+    dct_field:
+        Attribute name on *dct* to overlay (default ``'Mask'``).
+    plane:
+        Slice plane (``'xy'``, ``'yz'``, or ``'xz'``).
+    slice_n:
+        Slice index. Defaults to mid-point.
+    alpha:
+        Opacity of the DCT overlay (0–1).
+    """
+    import matplotlib.pyplot as plt
+
+    plane = plane.lower()
+    axis_map = {
+        "xy": (2, lambda arr, s: arr[:, :, s]),
+        "yx": (2, lambda arr, s: arr[:, :, s]),
+        "yz": (1, lambda arr, s: arr[:, s, :]),
+        "zy": (1, lambda arr, s: arr[:, s, :]),
+        "xz": (0, lambda arr, s: arr[s, :, :]),
+        "zx": (0, lambda arr, s: arr[s, :, :]),
+    }
+    if plane not in axis_map:
+        raise ValueError(f"Unknown plane '{plane}'. Choose from xy, yz, xz.")
+
+    axis, slicer = axis_map[plane]
+    ref_vol = pct.vol
+    dct_vol = getattr(dct, dct_field)
+
+    if slice_n is None:
+        slice_n = ref_vol.shape[axis] // 2
+
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharex=True, sharey=True)
+
+    pct_slice = slicer(ref_vol, slice_n)
+    dct_slice = slicer(dct_vol, slice_n)
+
+    axes[0].imshow(pct_slice, cmap="gray")
+    axes[0].set_title("PCT (fixed)")
+
+    axes[1].imshow(dct_slice, cmap="hot")
+    axes[1].set_title(f"DCT {dct_field} (moving)")
+
+    axes[2].imshow(pct_slice, cmap="gray")
+    axes[2].imshow(dct_slice, cmap="hot", alpha=alpha)
+    axes[2].set_title("Overlay")
+
+    plt.tight_layout()
+    plt.show()</code></pre>
+            </details>
+    </div>
+
+</div><hr />
+<h2 id="interactive">Interactive</h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="multimodal_registration.interactive.ManualRegistration" class="doc doc-heading">
+            <code>multimodal_registration.interactive.ManualRegistration</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Interactive cross-section overlay for manual registration.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>dct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dct.DCT" href="#multimodal_registration.dct.DCT">DCT</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>DCT object (already upscaled and padded to PCT frame).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.pct.ReferencePCT" href="#multimodal_registration.pct.ReferencePCT">ReferencePCT</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>PCT reference object.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dct_field</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;Mask&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Attribute on <em>dct</em> used as the moving image (default <code>'Mask'</code>).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pct_field</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;mask&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Attribute on <em>pct</em> used as the fixed image (default <code>'mask'</code>).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>step</code></b>
+                  (<code><span title="float">float</span></code>, default:
+                      <code>1.0</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Initial shift step in voxels. Supports sub-pixel values.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>alpha</code></b>
+                  (<code><span title="float">float</span></code>, default:
+                      <code>0.5</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Initial opacity of the DCT overlay layer (0–1).</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/multimodal_registration/interactive.py</code></summary>
+                <pre class="highlight"><code class="language-python">class ManualRegistration:
+    """Interactive cross-section overlay for manual registration.
+
+    Parameters
+    ----------
+    dct:
+        DCT object (already upscaled and padded to PCT frame).
+    pct:
+        PCT reference object.
+    dct_field:
+        Attribute on *dct* used as the moving image (default ``'Mask'``).
+    pct_field:
+        Attribute on *pct* used as the fixed image (default ``'mask'``).
+    step:
+        Initial shift step in voxels. Supports sub-pixel values.
+    alpha:
+        Initial opacity of the DCT overlay layer (0–1).
+    """
+
+    def __init__(
+        self,
+        dct: DCT,
+        pct: ReferencePCT,
+        dct_field: str = "Mask",
+        pct_field: str = "mask",
+        step: float = 1.0,
+        alpha: float = 0.5,
+    ):
+        self.dct = dct
+        self.pct = pct
+        self._dct_vol = np.asarray(getattr(dct, dct_field), dtype=float)
+        self._pct_vol = np.asarray(getattr(pct, pct_field), dtype=float)
+
+        # Mutable state
+        self.shifts: list[float] = [0.0, 0.0, 0.0]   # [ax0, ax1, ax2]
+        self.flips: list[bool] = [False, False, False]
+        self._plane_idx: int = 0
+        self.step: float = step
+        self.alpha: float = alpha
+
+    # ------------------------------------------------------------------
+    # State helpers
+    # ------------------------------------------------------------------
+
+    @property
+    def plane(self) -&gt; str:
+        return _PLANES[self._plane_idx]
+
+    def _status_str(self) -&gt; str:
+        return (
+            f"plane={self.plane}  step={self.step}  "
+            f"shifts={[round(s, 3) for s in self.shifts]}  "
+            f"flips={self.flips}"
+        )
+
+    def _get_slices(self) -&gt; tuple[np.ndarray, np.ndarray]:
+        """Return *(pct_slice, dct_slice)* for the current plane and state."""
+        dct = self._dct_vol
+        pct = self._pct_vol
+
+        # Apply flips to the DCT preview copy
+        for axis, flipped in enumerate(self.flips):
+            if flipped:
+                dct = np.flip(dct, axis=axis)
+
+        row_ax, col_ax, _ = _PLANE_AXES[self.plane]
+        shape = dct.shape
+
+        if self.plane == "xz":
+            mid = shape[1] // 2
+            pct_sl = pct[:, mid, :]
+            dct_sl = dct[:, mid, :]
+        elif self.plane == "xy":
+            mid = shape[2] // 2
+            pct_sl = pct[:, :, mid]
+            dct_sl = dct[:, :, mid]
+        else:  # yz
+            mid = shape[0] // 2
+            pct_sl = pct[mid, :, :]
+            dct_sl = dct[mid, :, :]
+
+        dct_sl = _shift_2d(dct_sl, self.shifts[row_ax], self.shifts[col_ax])
+
+        return np.asarray(pct_sl, dtype=float), dct_sl
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    def apply(self) -&gt; None:
+        """Apply accumulated flips and shifts to the DCT object in-place."""
+        for axis, flipped in enumerate(self.flips):
+            if flipped:
+                self.dct.flip(axis=axis)
+        if any(s != 0.0 for s in self.shifts):
+            self.dct.shift(tuple(self.shifts))  # type: ignore[arg-type]
+        self.shifts = [0.0, 0.0, 0.0]
+        self.flips = [False, False, False]
+
+    def show(self) -&gt; None:
+        """Launch the interactive UI."""
+        if _is_jupyter():
+            self._show_jupyter()
+        else:
+            self._show_script()
+
+    # ------------------------------------------------------------------
+    # Jupyter UI
+    # ------------------------------------------------------------------
+
+    def _show_jupyter(self) -&gt; None:
+        try:
+            import ipywidgets as widgets
+            from IPython.display import display
+        except ImportError as e:
+            raise ImportError(
+                "ipywidgets is required for Jupyter mode: pip install ipywidgets"
+            ) from e
+
+        import matplotlib.pyplot as plt
+
+        fig, axes = plt.subplots(1, 3, figsize=(14, 5), sharex=True, sharey=True)
+        fig.tight_layout()
+
+        pct_sl, dct_sl = self._get_slices()
+        im_pct    = axes[0].imshow(pct_sl, cmap="gray", origin="lower")
+        im_dct    = axes[1].imshow(dct_sl, cmap="hot",  origin="lower")
+        im_ov_bg  = axes[2].imshow(pct_sl, cmap="gray", origin="lower")
+        im_ov_fg  = axes[2].imshow(dct_sl, cmap="hot",  origin="lower", alpha=self.alpha)
+        for ax, title in zip(axes, ["PCT (fixed)", "DCT (moving)", "Overlay"]):
+            ax.set_title(title)
+            ax.axis("off")
+        plt.show()
+
+        # --- widgets -------------------------------------------------------
+        style = {"description_width": "initial"}
+
+        w_plane = widgets.Dropdown(options=_PLANES, value=self.plane,
+                                   description="Plane:", style=style)
+        w_step  = widgets.Dropdown(options=_STEPS, value=self.step,
+                                   description="Step (vox):", style=style)
+        w_alpha = widgets.FloatSlider(value=self.alpha, min=0.0, max=1.0, step=0.05,
+                                      description="Overlay α:", style=style)
+
+        w_d0 = widgets.FloatText(value=0.0, description="Δ axis 0:", step=self.step, style=style)
+        w_d1 = widgets.FloatText(value=0.0, description="Δ axis 1:", step=self.step, style=style)
+        w_d2 = widgets.FloatText(value=0.0, description="Δ axis 2:", step=self.step, style=style)
+
+        w_flip0 = widgets.ToggleButton(value=False, description="Flip axis 0", button_style="warning")
+        w_flip1 = widgets.ToggleButton(value=False, description="Flip axis 1", button_style="warning")
+        w_flip2 = widgets.ToggleButton(value=False, description="Flip axis 2", button_style="warning")
+
+        w_apply  = widgets.Button(description="Apply to DCT", button_style="success")
+        w_status = widgets.Label(value=self._status_str())
+
+        def _update(*_):
+            self.shifts = [w_d0.value, w_d1.value, w_d2.value]
+            self.flips  = [w_flip0.value, w_flip1.value, w_flip2.value]
+            self._plane_idx = _PLANES.index(w_plane.value)
+            self.step  = w_step.value
+            self.alpha = w_alpha.value
+
+            pct_sl, dct_sl = self._get_slices()
+            for im, data in [(im_pct, pct_sl), (im_dct, dct_sl),
+                             (im_ov_bg, pct_sl), (im_ov_fg, dct_sl)]:
+                im.set_data(data)
+                im.autoscale()
+            im_ov_fg.set_alpha(self.alpha)
+            fig.canvas.draw_idle()
+            w_status.value = self._status_str()
+
+        def _on_apply(_):
+            self.apply()
+            w_status.value = "Applied — shifts and flips written to DCT object."
+
+        for w in [w_d0, w_d1, w_d2, w_flip0, w_flip1, w_flip2,
+                  w_plane, w_step, w_alpha]:
+            w.observe(_update, names="value")
+        w_apply.on_click(_on_apply)
+
+        display(widgets.VBox([
+            widgets.HBox([w_plane, w_step, w_alpha]),
+            widgets.HBox([w_d0, w_d1, w_d2]),
+            widgets.HBox([w_flip0, w_flip1, w_flip2]),
+            widgets.HBox([w_apply, w_status]),
+        ]))
+
+    # ------------------------------------------------------------------
+    # Script UI (matplotlib keyboard events)
+    # ------------------------------------------------------------------
+
+    def _show_script(self) -&gt; None:
+        import matplotlib.pyplot as plt
+
+        fig, axes = plt.subplots(1, 3, figsize=(14, 5), sharex=True, sharey=True)
+        fig.subplots_adjust(top=0.82, bottom=0.12)
+
+        pct_sl, dct_sl = self._get_slices()
+        im_pct   = axes[0].imshow(pct_sl, cmap="gray", origin="lower")
+        im_dct   = axes[1].imshow(dct_sl, cmap="hot",  origin="lower")
+        im_ov_bg = axes[2].imshow(pct_sl, cmap="gray", origin="lower")
+        im_ov_fg = axes[2].imshow(dct_sl, cmap="hot",  origin="lower", alpha=self.alpha)
+        for ax, title in zip(axes, ["PCT (fixed)", "DCT (moving)", "Overlay"]):
+            ax.set_title(title)
+            ax.axis("off")
+
+        help_lines = (
+            "← → ↑ ↓ : shift in-plane   |   w / s : shift out-of-plane   |   "
+            "0 / 1 / 2 : flip axis\n"
+            "Tab : cycle plane   |   + / - : step size   |   "
+            "a : apply &amp; close   |   q : quit"
+        )
+        fig.text(0.5, 0.97, help_lines, ha="center", va="top",
+                 fontsize=8, family="monospace", transform=fig.transFigure)
+
+        status_txt = fig.text(0.5, 0.02, self._status_str(),
+                              ha="center", va="bottom", fontsize=9, family="monospace")
+
+        def _redraw():
+            pct_sl, dct_sl = self._get_slices()
+            for im, data in [(im_pct, pct_sl), (im_dct, dct_sl),
+                             (im_ov_bg, pct_sl), (im_ov_fg, dct_sl)]:
+                im.set_data(data)
+                im.autoscale()
+            im_ov_fg.set_alpha(self.alpha)
+            status_txt.set_text(self._status_str())
+            fig.canvas.draw_idle()
+
+        def _on_key(event):
+            if event.key is None:
+                return
+
+            row_ax, col_ax, dep_ax = _PLANE_AXES[self.plane]
+            s = self.step
+
+            if   event.key == "up":       self.shifts[row_ax] += s
+            elif event.key == "down":     self.shifts[row_ax] -= s
+            elif event.key == "right":    self.shifts[col_ax] += s
+            elif event.key == "left":     self.shifts[col_ax] -= s
+            elif event.key in ("w","W"):  self.shifts[dep_ax] += s
+            elif event.key in ("s","S"):  self.shifts[dep_ax] -= s
+            elif event.key == "0":        self.flips[0] = not self.flips[0]
+            elif event.key == "1":        self.flips[1] = not self.flips[1]
+            elif event.key == "2":        self.flips[2] = not self.flips[2]
+            elif event.key == "tab":
+                self._plane_idx = (self._plane_idx + 1) % len(_PLANES)
+            elif event.key in ("+", "="):
+                self.step = _next_step(self.step, +1)
+            elif event.key == "-":
+                self.step = _next_step(self.step, -1)
+            elif event.key in ("a", "A"):
+                self.apply()
+                plt.close(fig)
+                return
+            elif event.key == "q":
+                plt.close(fig)
+                return
+            else:
+                return
+
+            _redraw()
+
+        fig.canvas.mpl_connect("key_press_event", _on_key)
+        plt.show()</code></pre>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="multimodal_registration.interactive.ManualRegistration.apply" class="doc doc-heading">
+            <code class="highlight language-python">apply()</code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Apply accumulated flips and shifts to the DCT object in-place.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/interactive.py</code></summary>
+              <pre class="highlight"><code class="language-python">def apply(self) -&gt; None:
+    """Apply accumulated flips and shifts to the DCT object in-place."""
+    for axis, flipped in enumerate(self.flips):
+        if flipped:
+            self.dct.flip(axis=axis)
+    if any(s != 0.0 for s in self.shifts):
+        self.dct.shift(tuple(self.shifts))  # type: ignore[arg-type]
+    self.shifts = [0.0, 0.0, 0.0]
+    self.flips = [False, False, False]</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="multimodal_registration.interactive.ManualRegistration.show" class="doc doc-heading">
+            <code class="highlight language-python">show()</code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Launch the interactive UI.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/interactive.py</code></summary>
+              <pre class="highlight"><code class="language-python">def show(self) -&gt; None:
+    """Launch the interactive UI."""
+    if _is_jupyter():
+        self._show_jupyter()
+    else:
+        self._show_script()</code></pre>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div><hr />
+<h2 id="deformation">Deformation</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.deformation.compute_deformation_gradient" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.deformation.compute_deformation_gradient(dvc)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Compute the Lagrangian deformation gradient field <strong>F = I + ∇U</strong>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>dvc</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dvc.DVC" href="#multimodal_registration.dvc.DVC">DVC</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>DVC object whose <code>displacement</code> array has shape <code>(nx, ny, nz, 3)</code>.
+Spatial derivatives are computed using the voxel spacings in
+<code>dvc.spacing</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+<b><code>F</code></b>(                  <code>ndarray, shape ``(nx, ny, nz, 3, 3)``</code>
+)              –
+              <div class="doc-md-description">
+                <p><code>F[..., i, j]</code> = δᵢⱼ + ∂Uᵢ/∂xⱼ</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/deformation.py</code></summary>
+              <pre class="highlight"><code class="language-python">def compute_deformation_gradient(dvc: DVC) -&gt; np.ndarray:
+    """Compute the Lagrangian deformation gradient field **F = I + ∇U**.
+
+    Parameters
+    ----------
+    dvc:
+        DVC object whose ``displacement`` array has shape ``(nx, ny, nz, 3)``.
+        Spatial derivatives are computed using the voxel spacings in
+        ``dvc.spacing``.
+
+    Returns
+    -------
+    F : ndarray, shape ``(nx, ny, nz, 3, 3)``
+        ``F[..., i, j]`` = δᵢⱼ + ∂Uᵢ/∂xⱼ
+    """
+    U  = dvc.displacement                       # (nx, ny, nz, 3)
+    sp = dvc.spacing                            # (dx, dy, dz)
+    shape = U.shape[:3]
+
+    F = np.zeros(shape + (3, 3), dtype=float)
+    for i in range(3):
+        F[..., i, i] = 1.0                      # identity diagonal
+
+    for i in range(3):                          # displacement component Uᵢ
+        grads = np.gradient(U[..., i], sp[0], sp[1], sp[2])
+        for j in range(3):                      # derivative direction xⱼ
+            F[..., i, j] += grads[j]
+
+    return F</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.deformation.extract_rotation_field" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.deformation.extract_rotation_field(F)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Extract the rotation part <strong>R</strong> of <strong>F</strong> via polar decomposition.</p>
+<p>Uses the SVD factorisation: F = U S Vᵀ  →  R = U Vᵀ ∈ SO(3).
+Vectorised over all leading (batch) dimensions.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>F</code></b>
+                  (<code>ndarray, shape ``(..., 3, 3)``</code>)
+              –
+              <div class="doc-md-description">
+                
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+<b><code>R</code></b>(                  <code>ndarray, shape ``(..., 3, 3)``</code>
+)              –
+              <div class="doc-md-description">
+                <p>Proper rotation matrices (det R = +1).</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/deformation.py</code></summary>
+              <pre class="highlight"><code class="language-python">def extract_rotation_field(F: np.ndarray) -&gt; np.ndarray:
+    """Extract the rotation part **R** of **F** via polar decomposition.
+
+    Uses the SVD factorisation: F = U S Vᵀ  →  R = U Vᵀ ∈ SO(3).
+    Vectorised over all leading (batch) dimensions.
+
+    Parameters
+    ----------
+    F : ndarray, shape ``(..., 3, 3)``
+
+    Returns
+    -------
+    R : ndarray, shape ``(..., 3, 3)``
+        Proper rotation matrices (det R = +1).
+    """
+    U, _, Vt = np.linalg.svd(F)
+    R = U @ Vt
+    # Ensure proper rotations — det = −1 can appear near singular F
+    det  = np.linalg.det(R)
+    fix  = np.where(det &lt; 0, -1.0, 1.0)
+    U[..., 2] *= fix[..., np.newaxis]           # flip last column of U
+    return U @ Vt</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.deformation.warp_dct" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.deformation.warp_dct(dct, dvc)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Warp all DCT volumes in-place using the DVC displacement field.</p>
+<p>Uses a pull-back (inverse) mapping::</p>
+<pre class="highlight"><code>src(x) = x − U(x)
+warped[x] = dct[src(x)]</code></pre>
+<p>Voxels outside the DVC ROI carry zero displacement (identity warp).
+Integer arrays (grain IDs, masks) use nearest-neighbour interpolation;
+float/RGB arrays use linear interpolation.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>dct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dct.DCT" href="#multimodal_registration.dct.DCT">DCT</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>DCT object (upscaled, padded and registered to PCT frame).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dvc</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dvc.DVC" href="#multimodal_registration.dvc.DVC">DVC</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>DVC object.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/deformation.py</code></summary>
+              <pre class="highlight"><code class="language-python">def warp_dct(dct: DCT, dvc: DVC) -&gt; None:
+    """Warp all DCT volumes in-place using the DVC displacement field.
+
+    Uses a pull-back (inverse) mapping::
+
+        src(x) = x − U(x)
+        warped[x] = dct[src(x)]
+
+    Voxels outside the DVC ROI carry zero displacement (identity warp).
+    Integer arrays (grain IDs, masks) use nearest-neighbour interpolation;
+    float/RGB arrays use linear interpolation.
+
+    Parameters
+    ----------
+    dct:
+        DCT object (upscaled, padded and registered to PCT frame).
+    dvc:
+        DVC object.
+    """
+    nx, ny, nz = dct.shape
+    dvc_coords = _dct_coords_in_dvc_grid(dct.shape, dvc)   # (3, N)
+
+    # Displacement at every DCT voxel (PCT voxel units); zero outside ROI
+    U_dct = _interpolate_field(dvc.displacement, dvc_coords, cval=0.0)  # (N, 3)
+
+    pct_coords = np.array(np.mgrid[0:nx, 0:ny, 0:nz], dtype=float).reshape(3, -1)
+    src_coords = (pct_coords - U_dct.T).reshape(3, nx, ny, nz)
+
+    for key in dct._vol_keys:
+        arr: np.ndarray = getattr(dct, key)
+        order = 0 if np.issubdtype(arr.dtype, np.integer) else 1
+
+        if arr.ndim == 3:
+            setattr(dct, key,
+                    map_coordinates(arr, src_coords, order=order, mode="nearest"))
+        elif arr.ndim == 4:
+            warped = np.empty_like(arr)
+            for c in range(arr.shape[3]):
+                warped[..., c] = map_coordinates(
+                    arr[..., c], src_coords, order=1, mode="nearest")
+            setattr(dct, key, warped)</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.deformation.update_ipf" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.deformation.update_ipf(dct, dvc, crystal_symmetry='cubic', reference_direction='001', euler_degrees=True)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Recompute the IPF colour map after applying DVC lattice rotations.</p>
+<p>For every DCT voxel:</p>
+<ol>
+<li>Retrieve the grain orientation from
+   <code>dct.EulerAngle[dct.GIDvol[i, j, k]]</code>.</li>
+<li>Rotate it by the local DVC rotation <strong>R</strong> (polar decomposition of
+   the deformation gradient interpolated to the DCT grid).</li>
+<li>Recompute the IPF colour using <em>orix</em> under the given crystal symmetry.</li>
+</ol>
+<p>The result is written back to <code>dct.IPF001</code>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>dct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dct.DCT" href="#multimodal_registration.dct.DCT">DCT</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>DCT object.  Must expose <code>EulerAngle</code> (shape <code>(n_grains, 3)</code>,
+Bunge ZXZ) and <code>GIDvol</code> (integer grain-ID volume).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dvc</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dvc.DVC" href="#multimodal_registration.dvc.DVC">DVC</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>DVC object.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>crystal_symmetry</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;cubic&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Crystal point-group symmetry.  Accepts common aliases
+(<code>'cubic'</code>, <code>'hexagonal'</code>, …) or any Hermann-Mauguin /
+Schoenflies string understood by orix (e.g. <code>'m-3m'</code>).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>reference_direction</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;001&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Sample axis for the IPF projection: <code>'001'</code> (default),
+<code>'010'</code>, or <code>'100'</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>euler_degrees</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p><code>True</code> if <code>dct.EulerAngle</code> is stored in degrees (typical for
+LabDCT / GrainMapper3D output).</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/deformation.py</code></summary>
+              <pre class="highlight"><code class="language-python">def update_ipf(
+    dct: DCT,
+    dvc: DVC,
+    crystal_symmetry: str = "cubic",
+    reference_direction: str = "001",
+    euler_degrees: bool = True,
+) -&gt; None:
+    """Recompute the IPF colour map after applying DVC lattice rotations.
+
+    For every DCT voxel:
+
+    1. Retrieve the grain orientation from
+       ``dct.EulerAngle[dct.GIDvol[i, j, k]]``.
+    2. Rotate it by the local DVC rotation **R** (polar decomposition of
+       the deformation gradient interpolated to the DCT grid).
+    3. Recompute the IPF colour using *orix* under the given crystal symmetry.
+
+    The result is written back to ``dct.IPF001``.
+
+    Parameters
+    ----------
+    dct:
+        DCT object.  Must expose ``EulerAngle`` (shape ``(n_grains, 3)``,
+        Bunge ZXZ) and ``GIDvol`` (integer grain-ID volume).
+    dvc:
+        DVC object.
+    crystal_symmetry:
+        Crystal point-group symmetry.  Accepts common aliases
+        (``'cubic'``, ``'hexagonal'``, …) or any Hermann-Mauguin /
+        Schoenflies string understood by orix (e.g. ``'m-3m'``).
+    reference_direction:
+        Sample axis for the IPF projection: ``'001'`` (default),
+        ``'010'``, or ``'100'``.
+    euler_degrees:
+        ``True`` if ``dct.EulerAngle`` is stored in degrees (typical for
+        LabDCT / GrainMapper3D output).
+    """
+    # --- orix imports (version-tolerant) -----------------------------------
+    try:
+        from orix.quaternion import Rotation
+        from orix.vector import Vector3d
+        from orix.quaternion.symmetry import get_point_group
+    except ImportError as e:
+        raise ImportError(
+            "orix is required for IPF colour computation.\n"
+            "Install it with:  pip install orix"
+        ) from e
+
+    try:
+        from orix.plot import IPFColorKey
+    except ImportError:
+        try:
+            from orix.plot.colors import IPFColorKey
+        except ImportError as e:
+            raise ImportError(
+                "Could not import IPFColorKey from orix.  "
+                "Please update orix: pip install --upgrade orix"
+            ) from e
+
+    # --- validate DCT attributes -------------------------------------------
+    for attr in ("EulerAngle", "GIDvol"):
+        if not hasattr(dct, attr):
+            raise AttributeError(
+                f"dct.{attr} not found.  Make sure '{attr}' is stored under "
+                f"the 'DS' group in the DCT HDF5 file."
+            )
+
+    # --- Step A: per-grain orientations ------------------------------------
+    euler = np.asarray(dct.EulerAngle, dtype=float)   # (n_grains, 3)
+    g_per_grain = Rotation.from_euler(
+        euler, degrees=euler_degrees)                   # (n_grains,)
+
+    # --- Step B: rotation field on DCT grid --------------------------------
+    F     = compute_deformation_gradient(dvc)          # (nx_d, ny_d, nz_d, 3, 3)
+    R_dvc = extract_rotation_field(F)                  # (nx_d, ny_d, nz_d, 3, 3)
+
+    dvc_coords = _dct_coords_in_dvc_grid(dct.shape, dvc)       # (3, N)
+    outside    = _outside_roi_mask(dvc_coords, R_dvc.shape[:3])
+
+    # Interpolate 9 matrix components; fill outside with 0 → identity below
+    R_interp = _interpolate_field(R_dvc, dvc_coords, cval=0.0)   # (N, 3, 3)
+    R_interp[outside] = np.eye(3)                     # identity outside ROI
+    R_interp = _reorthogonalise(R_interp)              # re-project to SO(3)
+
+    R_voxel = Rotation.from_matrix(R_interp)           # (N,)
+
+    # --- Step C: per-voxel grain orientations ------------------------------
+    # MATLAB reconstruction codes use 1-based grain IDs (0 = unindexed).
+    # EulerAngle row 0 → grain 1, row 1 → grain 2, etc.
+    gid_flat   = dct.GIDvol.ravel().astype(int)        # (N,)  values 0..n_grains
+    indexed    = gid_flat &gt; 0                          # mask of indexed voxels
+    row_idx    = np.clip(gid_flat - 1, 0, len(g_per_grain) - 1)  # 0-based rows
+
+    # EulerAngle shape: h5py reads MATLAB (3, n_grains) as (n_grains, 3) — correct.
+    # But if it comes out (3, n_grains), transpose it.
+    if euler.shape[0] == 3 and euler.ndim == 2:
+        euler = euler.T
+        g_per_grain = Rotation.from_euler(euler, degrees=euler_degrees)
+
+    g_voxel = g_per_grain[row_idx]                     # (N,)
+
+    # --- Step D: apply local rotation  g_new = R · g_old ------------------
+    g_new = R_voxel * g_voxel                          # (N,)
+
+    # --- Step E: IPF colours -----------------------------------------------
+    sym_str = _SYMMETRY_ALIASES.get(crystal_symmetry.lower(), crystal_symmetry)
+    pg = get_point_group(sym_str)
+
+    dir_map = {
+        "001": Vector3d.zvector(),
+        "010": Vector3d.yvector(),
+        "100": Vector3d.xvector(),
+    }
+    ref_dir = dir_map.get(reference_direction, Vector3d.zvector())
+
+    ipf_key = IPFColorKey(pg, direction=ref_dir)
+    rgb = np.asarray(ipf_key.orientation2color(g_new), dtype=float)  # (N, 3) in [0,1]
+
+    # Unindexed voxels (GID == 0) → black
+    rgb[~indexed] = 0.0
+
+    nx, ny, nz = dct.shape
+
+    # Preserve original dtype (uint8 0–255 vs float 0–1)
+    if dct.IPF001.dtype == np.uint8:
+        dct.IPF001 = (rgb * 255).astype(np.uint8).reshape(nx, ny, nz, 3)
+    else:
+        dct.IPF001 = rgb.astype(dct.IPF001.dtype).reshape(nx, ny, nz, 3)</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.deformation.apply_dvc" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.deformation.apply_dvc(dct, dvc, crystal_symmetry='cubic', reference_direction='001', euler_degrees=True, update_orientations=True)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Apply DVC results to DCT in-place: warp volumes then update IPF.</p>
+<p>Calls :func:<code>warp_dct</code> followed by :func:<code>update_ipf</code>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>dct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dct.DCT" href="#multimodal_registration.dct.DCT">DCT</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>DCT object (upscaled, padded, registered to PCT frame).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dvc</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dvc.DVC" href="#multimodal_registration.dvc.DVC">DVC</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>DVC object.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>crystal_symmetry</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;cubic&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Point-group symmetry string (default <code>'cubic'</code>).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>reference_direction</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;001&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>IPF projection axis (<code>'001'</code>, <code>'010'</code>, or <code>'100'</code>).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>euler_degrees</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether <code>dct.EulerAngle</code> is stored in degrees.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>update_orientations</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>If <code>False</code>, skip the IPF update and only warp the spatial volumes.
+Useful for a quick geometric check without requiring orix.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/deformation.py</code></summary>
+              <pre class="highlight"><code class="language-python">def apply_dvc(
+    dct: DCT,
+    dvc: DVC,
+    crystal_symmetry: str = "cubic",
+    reference_direction: str = "001",
+    euler_degrees: bool = True,
+    update_orientations: bool = True,
+) -&gt; None:
+    """Apply DVC results to DCT in-place: warp volumes then update IPF.
+
+    Calls :func:`warp_dct` followed by :func:`update_ipf`.
+
+    Parameters
+    ----------
+    dct:
+        DCT object (upscaled, padded, registered to PCT frame).
+    dvc:
+        DVC object.
+    crystal_symmetry:
+        Point-group symmetry string (default ``'cubic'``).
+    reference_direction:
+        IPF projection axis (``'001'``, ``'010'``, or ``'100'``).
+    euler_degrees:
+        Whether ``dct.EulerAngle`` is stored in degrees.
+    update_orientations:
+        If ``False``, skip the IPF update and only warp the spatial volumes.
+        Useful for a quick geometric check without requiring orix.
+    """
+    warp_dct(dct, dvc)
+
+    if update_orientations:
+        update_ipf(
+            dct, dvc,
+            crystal_symmetry=crystal_symmetry,
+            reference_direction=reference_direction,
+            euler_degrees=euler_degrees,
+        )</code></pre>
+            </details>
+    </div>
+
+</div><hr />
+<h2 id="export">Export</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.io.write" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.io.write(path, dct=None, pct=None, dvc=None, **kwargs)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Write data to <em>path</em>, inferring the format from the file extension.</p>
+<p>Supported extensions: <code>.h5</code>, <code>.hdf5</code>, <code>.vtk</code>, <code>.vts</code>, <code>.vtu</code>,
+<code>.dream3d</code>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>path</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Output file path.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dct.DCT" href="#multimodal_registration.dct.DCT">DCT</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>DCT object.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.pct.ReferencePCT" href="#multimodal_registration.pct.ReferencePCT">ReferencePCT</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>PCT object (HDF5 output only).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dvc</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dvc.DVC" href="#multimodal_registration.dvc.DVC">DVC</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>DVC object (HDF5 and VTK outputs only).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>**kwargs</code></b>
+              –
+              <div class="doc-md-description">
+                <p>Passed through to the format-specific writer.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/io.py</code></summary>
+              <pre class="highlight"><code class="language-python">def write(
+    path: str,
+    dct: DCT | None = None,
+    pct: ReferencePCT | None = None,
+    dvc: DVC | None = None,
+    **kwargs,
+) -&gt; None:
+    """Write data to *path*, inferring the format from the file extension.
+
+    Supported extensions: ``.h5``, ``.hdf5``, ``.vtk``, ``.vts``, ``.vtu``,
+    ``.dream3d``.
+
+    Parameters
+    ----------
+    path:
+        Output file path.
+    dct:
+        DCT object.
+    pct:
+        PCT object (HDF5 output only).
+    dvc:
+        DVC object (HDF5 and VTK outputs only).
+    **kwargs:
+        Passed through to the format-specific writer.
+    """
+    ext = Path(path).suffix.lower()
+    fmt = _EXT_MAP.get(ext)
+
+    if fmt is None:
+        raise ValueError(
+            f"Unrecognised extension '{ext}'. "
+            f"Supported: {list(_EXT_MAP)}"
+        )
+
+    if fmt == "h5":
+        write_h5(path, dct=dct, pct=pct, dvc=dvc, **kwargs)
+    elif fmt == "vtk":
+        write_vtk(path, dct=dct, dvc=dvc, **kwargs)
+    elif fmt == "dream3d":
+        if dct is None:
+            raise ValueError("write_dream3d requires a DCT object.")
+        write_dream3d(path, dct, **kwargs)</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.io.write_h5" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.io.write_h5(path, dct=None, pct=None, dvc=None)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Write DCT, PCT and/or DVC data to a single HDF5 file.</p>
+<p>The file mirrors the original input layout so that it can be passed
+back to the loaders:</p>
+<p>.. code-block:: text</p>
+<pre class="highlight"><code>/DCT/DS/&lt;key&gt;          — all arrays loaded from the DCT HDF5
+/PCT/vol               — PCT grey-level volume
+/PCT/mask              — Otsu binary mask
+/DVC/displacement      — displacement field (nx, ny, nz, 3)
+/DVC/strain/&lt;key&gt;      — strain fields (if present)
+/DVC/origin            — ROI origin in PCT voxel space
+/DVC/spacing           — DVC grid spacing</code></pre>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>path</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Output file path (<code>*.h5</code> or <code>*.hdf5</code>).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dct.DCT" href="#multimodal_registration.dct.DCT">DCT</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>DCT object to export.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.pct.ReferencePCT" href="#multimodal_registration.pct.ReferencePCT">ReferencePCT</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>PCT reference object to export.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dvc</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dvc.DVC" href="#multimodal_registration.dvc.DVC">DVC</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>DVC object to export.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/io.py</code></summary>
+              <pre class="highlight"><code class="language-python">def write_h5(
+    path: str,
+    dct: DCT | None = None,
+    pct: ReferencePCT | None = None,
+    dvc: DVC | None = None,
+) -&gt; None:
+    """Write DCT, PCT and/or DVC data to a single HDF5 file.
+
+    The file mirrors the original input layout so that it can be passed
+    back to the loaders:
+
+    .. code-block:: text
+
+        /DCT/DS/&lt;key&gt;          — all arrays loaded from the DCT HDF5
+        /PCT/vol               — PCT grey-level volume
+        /PCT/mask              — Otsu binary mask
+        /DVC/displacement      — displacement field (nx, ny, nz, 3)
+        /DVC/strain/&lt;key&gt;      — strain fields (if present)
+        /DVC/origin            — ROI origin in PCT voxel space
+        /DVC/spacing           — DVC grid spacing
+
+    Parameters
+    ----------
+    path:
+        Output file path (``*.h5`` or ``*.hdf5``).
+    dct:
+        DCT object to export.
+    pct:
+        PCT reference object to export.
+    dvc:
+        DVC object to export.
+    """
+    import h5py
+
+    with h5py.File(path, "w") as hout:
+        if dct is not None:
+            grp = hout.require_group("DCT/DS")
+            grp.attrs["voxel_size"] = dct.voxel_size
+            for key in vars(dct):
+                if key.startswith("_"):
+                    continue
+                val = getattr(dct, key)
+                if isinstance(val, np.ndarray):
+                    grp.create_dataset(key, data=val, compression="gzip",
+                                       compression_opts=4)
+
+        if pct is not None:
+            grp = hout.require_group("PCT")
+            grp.create_dataset("vol",  data=pct.vol,  compression="gzip",
+                               compression_opts=4)
+            grp.create_dataset("mask", data=pct.mask, compression="gzip",
+                               compression_opts=4)
+
+        if dvc is not None:
+            grp = hout.require_group("DVC")
+            grp.create_dataset("displacement", data=dvc.displacement,
+                               compression="gzip", compression_opts=4)
+            grp.create_dataset("origin",  data=np.array(dvc.origin))
+            grp.create_dataset("spacing", data=np.array(dvc.spacing))
+            if dvc.strain:
+                sgrp = grp.require_group("strain")
+                for key, arr in dvc.strain.items():
+                    sgrp.create_dataset(key, data=arr, compression="gzip",
+                                        compression_opts=4)</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.io.write_vtk" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.io.write_vtk(path, dct=None, dvc=None)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Write DCT and/or DVC volumes as VTK ImageData files.</p>
+<p>When both <em>dct</em> and <em>dvc</em> are supplied, two files are written:
+<code>&lt;stem&gt;_dct.vts</code> and <code>&lt;stem&gt;_dvc.vts</code>.  When only one is given,
+a single file is written at <em>path</em>.</p>
+<p>Requires <strong>pyvista</strong> (<code>pip install "multimodal-registration[vtk]"</code>).</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>path</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Output file path.  The suffix determines the VTK format
+(<code>.vts</code> structured grid recommended).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dct.DCT" href="#multimodal_registration.dct.DCT">DCT</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>DCT object to export.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dvc</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dvc.DVC" href="#multimodal_registration.dvc.DVC">DVC</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>DVC object to export.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/io.py</code></summary>
+              <pre class="highlight"><code class="language-python">def write_vtk(
+    path: str,
+    dct: DCT | None = None,
+    dvc: DVC | None = None,
+) -&gt; None:
+    """Write DCT and/or DVC volumes as VTK ImageData files.
+
+    When both *dct* and *dvc* are supplied, two files are written:
+    ``&lt;stem&gt;_dct.vts`` and ``&lt;stem&gt;_dvc.vts``.  When only one is given,
+    a single file is written at *path*.
+
+    Requires **pyvista** (``pip install "multimodal-registration[vtk]"``).
+
+    Parameters
+    ----------
+    path:
+        Output file path.  The suffix determines the VTK format
+        (``.vts`` structured grid recommended).
+    dct:
+        DCT object to export.
+    dvc:
+        DVC object to export.
+    """
+    try:
+        import pyvista as pv
+    except ImportError as e:
+        raise ImportError(
+            "pyvista is required for VTK export: "
+            "pip install \"multimodal-registration[vtk]\""
+        ) from e
+
+    p = Path(path)
+    write_both = dct is not None and dvc is not None
+
+    if dct is not None:
+        out_path = str(p.with_stem(p.stem + "_dct")) if write_both else path
+        _write_dct_vtk(dct, out_path, pv)
+
+    if dvc is not None:
+        out_path = str(p.with_stem(p.stem + "_dvc")) if write_both else path
+        _write_dvc_vtk(dvc, out_path, pv)</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.io.write_dream3d" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.io.write_dream3d(path, dct, euler_degrees=True, voxel_size=None, phase_id=1)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Write a DREAM.3D 6.x compatible HDF5 file.</p>
+<p>The output can be opened directly in DREAM.3D or ParaView (with the
+DREAM.3D plugin) for multimodal visualisation alongside DVC results.</p>
+
+
+<details class="required-dct-attributes" open>
+  <summary>Required DCT attributes</summary>
+  <p><code>GIDvol</code>      grain ID volume (1-based, 0 = unindexed).
+<code>EulerAngle</code>  per-grain Euler angles, shape <code>(n_grains, 3)</code>, Bunge ZXZ.
+<code>IPF001</code>      per-voxel IPF RGB, shape <code>(nx, ny, nz, 3)</code>.
+<code>Mask</code>        binary sample mask, shape <code>(nx, ny, nz)</code>.</p>
+</details>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>path</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Output file path (<code>*.dream3d</code>).</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dct</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="multimodal_registration.dct.DCT" href="#multimodal_registration.dct.DCT">DCT</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>DCT object to export.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>euler_degrees</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether <code>dct.EulerAngle</code> is stored in degrees.  DREAM.3D expects
+radians; conversion is applied automatically.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>voxel_size</code></b>
+                  (<code><span title="float">float</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Isotropic voxel size in µm.  Defaults to <code>dct.voxel_size</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>phase_id</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code>1</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Phase index written to the <code>Phases</code> CellData array (default 1).</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/io.py</code></summary>
+              <pre class="highlight"><code class="language-python">def write_dream3d(
+    path: str,
+    dct: DCT,
+    euler_degrees: bool = True,
+    voxel_size: float | None = None,
+    phase_id: int = 1,
+) -&gt; None:
+    """Write a DREAM.3D 6.x compatible HDF5 file.
+
+    The output can be opened directly in DREAM.3D or ParaView (with the
+    DREAM.3D plugin) for multimodal visualisation alongside DVC results.
+
+    Required DCT attributes
+    -----------------------
+    ``GIDvol``      grain ID volume (1-based, 0 = unindexed).
+    ``EulerAngle``  per-grain Euler angles, shape ``(n_grains, 3)``, Bunge ZXZ.
+    ``IPF001``      per-voxel IPF RGB, shape ``(nx, ny, nz, 3)``.
+    ``Mask``        binary sample mask, shape ``(nx, ny, nz)``.
+
+    Parameters
+    ----------
+    path:
+        Output file path (``*.dream3d``).
+    dct:
+        DCT object to export.
+    euler_degrees:
+        Whether ``dct.EulerAngle`` is stored in degrees.  DREAM.3D expects
+        radians; conversion is applied automatically.
+    voxel_size:
+        Isotropic voxel size in µm.  Defaults to ``dct.voxel_size``.
+    phase_id:
+        Phase index written to the ``Phases`` CellData array (default 1).
+    """
+    import h5py
+
+    nx, ny, nz = dct.shape
+    n_cells     = nx * ny * nz
+    vs          = voxel_size if voxel_size is not None else dct.voxel_size
+    tuple_dims  = [nx, ny, nz]                    # DREAM.3D (x, y, z)
+
+    # Per-grain Euler angles in radians (1-based: grain gid → row gid-1)
+    euler = np.asarray(getattr(dct, "EulerAngle", np.zeros((1, 3))), dtype=np.float32)
+    if euler_degrees:
+        euler = np.deg2rad(euler)
+
+    gid_flat  = dct.GIDvol.ravel(order="F").astype(np.int32)   # x-fastest
+    n_grains  = int(gid_flat.max())                             # max grain ID
+
+    # Per-voxel Euler angles: grain gid (1-based) → euler row gid-1
+    euler_padded = np.zeros((n_grains + 1, 3), dtype=np.float32)
+    n_rows = min(len(euler), n_grains)
+    euler_padded[1 : n_rows + 1] = euler[:n_rows]              # row 0 = unindexed → 0
+    euler_per_voxel = euler_padded[np.clip(gid_flat, 0, n_grains)]  # (N, 3)
+
+    # Per-voxel phases
+    phases_voxel = np.where(gid_flat &gt; 0, phase_id, 0).astype(np.int32).reshape(-1, 1)
+
+    with h5py.File(path, "w") as hout:
+        # ── root attribute ──────────────────────────────────────────────
+        hout.attrs["FileVersion"] = np.bytes_("7.0")
+
+        # ── DataContainerBundles (required but empty) ────────────────────
+        hout.require_group("DataContainerBundles")
+
+        # ── DataContainer ────────────────────────────────────────────────
+        dc = hout.require_group("DataContainers/ImageGeomDataContainer")
+
+        # ── Geometry ─────────────────────────────────────────────────────
+        geo = dc.require_group("_SIMPL_GEOMETRY")
+        geo.create_dataset("GEOMETRY_TYPE",           data=np.bytes_("ImageGeometry"))
+        geo.create_dataset("GEOMETRY_TYPE_ID",        data=np.uint32(0))
+        geo.create_dataset("SPATIAL_DIMENSION_COUNT", data=np.uint32(3))
+        geo.create_dataset("DIMENSIONS",  data=np.array([nx, ny, nz], dtype=np.uint64))
+        geo.create_dataset("ORIGIN",      data=np.array([0., 0., 0.], dtype=np.float32))
+        geo.create_dataset("SPACING",     data=np.array([vs, vs, vs], dtype=np.float32))
+
+        # ── CellData ─────────────────────────────────────────────────────
+        cell = dc.require_group("CellData")
+        cell.attrs["AttributeMatrixType"] = np.uint32(3)        # Cell
+        cell.attrs["TupleDimensions"]     = np.array(tuple_dims, dtype=np.uint64)
+
+        def _add_cell(name, data, comp_dims):
+            ds = cell.create_dataset(name, data=data, compression="gzip",
+                                     compression_opts=4)
+            _set_dream3d_attrs(ds, comp_dims, _dream3d_type(data), tuple_dims)
+
+        _add_cell("FeatureIds",  gid_flat.reshape(-1, 1),          [1])
+        _add_cell("Phases",      phases_voxel,                     [1])
+        _add_cell("EulerAngles", euler_per_voxel,                  [3])
+        _add_cell("Mask",
+                  _dream3d_flat_scalar(dct.Mask.astype(np.uint8)), [1])
+
+        if hasattr(dct, "IPF001"):
+            ipf = dct.IPF001
+            if ipf.dtype != np.uint8:
+                ipf = (np.clip(ipf, 0.0, 1.0) * 255).astype(np.uint8)
+            _add_cell("IPFColors", _dream3d_flat_vector(ipf),      [3])
+
+        # Any additional 3-D volumes from the DCT (GIDvol already covered)
+        skip = {"GIDvol", "Mask", "IPF001", "EulerAngle", "VoxSize",
+                "RodVec", "Coord", "Diameter", "Dimension"}
+        for key in dct._vol_keys:
+            if key in skip:
+                continue
+            arr = getattr(dct, key)
+            if arr.ndim == 3:
+                flat = _dream3d_flat_scalar(arr.astype(np.float32))
+                _add_cell(key, flat, [1])
+            elif arr.ndim == 4:
+                flat = _dream3d_flat_vector(arr.astype(np.float32))
+                _add_cell(key, flat, [arr.shape[3]])
+
+        # ── CellFeatureData ──────────────────────────────────────────────
+        feat = dc.require_group("CellFeatureData")
+        feat.attrs["AttributeMatrixType"] = np.uint32(4)          # CellFeature
+        feat.attrs["TupleDimensions"]     = np.array([n_grains + 1], dtype=np.uint64)
+
+        def _add_feat(name, data, comp_dims):
+            ds = feat.create_dataset(name, data=data, compression="gzip",
+                                     compression_opts=4)
+            _set_dream3d_attrs(ds, comp_dims, _dream3d_type(data),
+                               [n_grains + 1])
+
+        active = np.zeros(n_grains + 1, dtype=np.uint8)
+        active[1:] = 1
+        _add_feat("Active",      active.reshape(-1, 1),            [1])
+        _add_feat("EulerAngles", euler_padded,                     [3])
+
+        feat_phases = np.zeros(n_grains + 1, dtype=np.int32)
+        feat_phases[1:] = phase_id
+        _add_feat("Phases",      feat_phases.reshape(-1, 1),       [1])
+
+        # ── Pipeline (minimal — required by DREAM.3D reader) ─────────────
+        pipe = hout.require_group("Pipeline")
+        pipe.attrs["Number_Filters"] = np.int32(1)
+        step = pipe.require_group("0")
+        step.create_dataset(
+            "Filter_Human_Label",
+            data=np.bytes_("Exported by multimodal-registration"))
+        step.create_dataset(
+            "Filter_Name",
+            data=np.bytes_("DataContainerWriter"))</code></pre>
+            </details>
+    </div>
+
+</div><hr />
+<h2 id="backends">Backends</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.backends.backend_name" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.backends.backend_name()</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Return the active backend name: <code>'cuda'</code> or <code>'cpu'</code>.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/backends.py</code></summary>
+              <pre class="highlight"><code class="language-python">def backend_name() -&gt; str:
+    """Return the active backend name: ``'cuda'`` or ``'cpu'``."""
+    return _BACKEND</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.backends.to_device" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.backends.to_device(arr)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Send a NumPy array to the active compute device (no-op on CPU).</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/backends.py</code></summary>
+              <pre class="highlight"><code class="language-python">def to_device(arr):
+    """Send a NumPy array to the active compute device (no-op on CPU)."""
+    if _BACKEND == "cuda":
+        return _XP.asarray(arr)
+    return arr</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="multimodal_registration.backends.to_numpy" class="doc doc-heading">
+            <code class="highlight language-python">multimodal_registration.backends.to_numpy(arr)</code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Convert an array to NumPy regardless of the active backend.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/multimodal_registration/backends.py</code></summary>
+              <pre class="highlight"><code class="language-python">def to_numpy(arr):
+    """Convert an array to NumPy regardless of the active backend."""
+    if _BACKEND == "cuda":
+        return _XP.asnumpy(arr)
+    import numpy as np
+
+    return np.asarray(arr)</code></pre>
+            </details>
+    </div>
+
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../guide/gpu/" class="btn btn-neutral float-left" title="GPU Acceleration"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/pedrodamas0803/multimodal-registration" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../../guide/gpu/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../assets/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

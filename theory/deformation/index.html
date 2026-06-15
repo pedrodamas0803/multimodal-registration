@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://pedrodamas0803.github.io/multimodal-registration/theory/deformation/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Deformation & Rotations - multimodal-registration</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Deformation \u0026 Rotations";
+        var mkdocs_page_input_path = "theory/deformation.md";
+        var mkdocs_page_url = "/multimodal-registration/theory/deformation/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> multimodal-registration
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Theory</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../registration/">Image Registration</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Deformation & Rotations</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#the-displacement-field">The displacement field</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#deformation-gradient">Deformation gradient</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#polar-decomposition">Polar decomposition</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#svd-route">SVD route</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#warping-dct-volumes">Warping DCT volumes</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#coordinate-mapping">Coordinate mapping</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#rotating-grain-orientations">Rotating grain orientations</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#interpolation-to-the-dct-grid">Interpolation to the DCT grid</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../crystallography/">Crystal Orientations & IPF</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../guide/workflow/">Full Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../guide/interactive/">Interactive Registration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../guide/export/">Exporting Data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../guide/gpu/">GPU Acceleration</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../api/reference/">API Reference</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">multimodal-registration</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Theory</li>
+      <li class="breadcrumb-item active">Deformation & Rotations</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/pedrodamas0803/multimodal-registration/edit/master/docs/theory/deformation.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="deformation-rotations">Deformation &amp; Rotations</h1>
+<p>DVC measures how a 3-D volume deforms between two loading states.  This page
+explains how the package converts a DVC displacement field into a local
+rotation field and uses it to warp DCT volumes and update crystal orientations.</p>
+<hr />
+<h2 id="the-displacement-field">The displacement field</h2>
+<p>DVC produces a displacement field <span class="arithmatex">\(\mathbf{U}(\mathbf{X})\)</span> defined on a
+regular grid in the <strong>reference</strong> (undeformed) configuration.  A material
+point at position <span class="arithmatex">\(\mathbf{X}\)</span> in the reference moves to:</p>
+<div class="arithmatex">\[
+\mathbf{x} = \mathbf{X} + \mathbf{U}(\mathbf{X})
+\]</div>
+<p>in the deformed configuration.  The field <span class="arithmatex">\(\mathbf{U}\)</span> is typically stored
+as a 4-D array of shape <span class="arithmatex">\((N_x, N_y, N_z, 3)\)</span>.</p>
+<hr />
+<h2 id="deformation-gradient">Deformation gradient</h2>
+<p>The local deformation is fully described by the <strong>deformation gradient tensor</strong>:</p>
+<div class="arithmatex">\[
+\mathbf{F} = \mathbf{I} + \nabla \mathbf{U}, \qquad
+F_{ij} = \delta_{ij} + \frac{\partial U_i}{\partial X_j}
+\]</div>
+<p><span class="arithmatex">\(\mathbf{F}\)</span> is a <span class="arithmatex">\(3 \times 3\)</span> tensor field computed numerically using
+central finite differences (<code>numpy.gradient</code>) with the DVC grid spacing as
+the step size.</p>
+<div class="admonition note">
+<p class="admonition-title">Spatial derivatives</p>
+<p>The gradient is taken with respect to the <strong>reference</strong> coordinates
+<span class="arithmatex">\(\mathbf{X}\)</span>, consistent with the Lagrangian description used by DVC.</p>
+</div>
+<hr />
+<h2 id="polar-decomposition">Polar decomposition</h2>
+<p>Any invertible tensor <span class="arithmatex">\(\mathbf{F}\)</span> (with <span class="arithmatex">\(\det \mathbf{F} &gt; 0\)</span>) admits a
+unique right polar decomposition:</p>
+<div class="arithmatex">\[
+\mathbf{F} = \mathbf{R}\,\mathbf{U}_s
+\]</div>
+<p>where <span class="arithmatex">\(\mathbf{R} \in \mathrm{SO}(3)\)</span> is a proper rotation matrix and
+<span class="arithmatex">\(\mathbf{U}_s\)</span> is a symmetric positive-definite stretch tensor.</p>
+<h3 id="svd-route">SVD route</h3>
+<p>The rotation <span class="arithmatex">\(\mathbf{R}\)</span> is extracted efficiently via the singular value
+decomposition:</p>
+<div class="arithmatex">\[
+\mathbf{F} = \mathbf{U}\,\mathbf{S}\,\mathbf{V}^\top
+\implies
+\mathbf{R} = \mathbf{U}\,\mathbf{V}^\top
+\]</div>
+<p>This is evaluated <strong>in batch</strong> over all voxels using <code>numpy.linalg.svd</code>,
+which vectorises over arbitrary leading dimensions:</p>
+<pre class="highlight"><code class="language-python">U, S, Vt = np.linalg.svd(F)          # F shape: (..., 3, 3)
+R = U @ Vt                            # R shape: (..., 3, 3)</code></pre>
+<p>A sign correction ensures <span class="arithmatex">\(\det \mathbf{R} = +1\)</span> (proper rotation) even
+near singular points where numerical noise can introduce a reflection.</p>
+<hr />
+<h2 id="warping-dct-volumes">Warping DCT volumes</h2>
+<p>To map DCT data from the reference into the deformed configuration, a
+<strong>pull-back</strong> (inverse) warp is used.  For each output voxel position
+<span class="arithmatex">\(\mathbf{x}\)</span>, the source position in the reference is approximated as:</p>
+<div class="arithmatex">\[
+\mathbf{X}(\mathbf{x}) \approx \mathbf{x} - \mathbf{U}(\mathbf{x})
+\]</div>
+<p>This is exact for small displacements and a good approximation for typical DVC
+fields.  The warped volume is then:</p>
+<div class="arithmatex">\[
+f_\text{deformed}(\mathbf{x}) = f_\text{ref}\!\left(\mathbf{x} - \mathbf{U}(\mathbf{x})\right)
+\]</div>
+<p>implemented via <code>scipy.ndimage.map_coordinates</code> with order-0 (nearest-neighbour)
+for integer arrays and order-1 (trilinear) for float arrays.</p>
+<h3 id="coordinate-mapping">Coordinate mapping</h3>
+<p>The DVC field covers only a <strong>ROI</strong> within the PCT frame.  Voxels outside the
+ROI receive zero displacement (identity warp), localised using <code>dvc.origin</code>
+and <code>dvc.spacing</code>:</p>
+<div class="arithmatex">\[
+\mathbf{p}_\text{DVC} = \frac{\mathbf{p}_\text{PCT} - \mathbf{o}}{\Delta}
+\]</div>
+<p>where <span class="arithmatex">\(\mathbf{o}\)</span> is the ROI origin and <span class="arithmatex">\(\Delta\)</span> is the DVC grid spacing,
+both in PCT voxel units.</p>
+<hr />
+<h2 id="rotating-grain-orientations">Rotating grain orientations</h2>
+<p>The rotation field <span class="arithmatex">\(\mathbf{R}(\mathbf{X})\)</span> describes how each material
+element has rotated from the reference to the deformed state.  The crystal
+orientation at a voxel transforms as:</p>
+<div class="arithmatex">\[
+\mathbf{g}_\text{new} = \mathbf{R}\,\mathbf{g}_\text{old}
+\]</div>
+<p>where <span class="arithmatex">\(\mathbf{g}\)</span> is the orientation matrix mapping crystal axes to sample
+axes (see <a href="../crystallography/">Crystal Orientations &amp; IPF</a>).</p>
+<h3 id="interpolation-to-the-dct-grid">Interpolation to the DCT grid</h3>
+<p><span class="arithmatex">\(\mathbf{R}\)</span> is defined on the (coarser) DVC grid and must be interpolated
+to the (finer) DCT grid.  The nine matrix components are interpolated
+independently with trilinear interpolation, after which each matrix is
+<strong>re-projected to <span class="arithmatex">\(\mathrm{SO}(3)\)</span></strong>  via a second SVD step to restore
+orthogonality lost during interpolation:</p>
+<div class="arithmatex">\[
+\tilde{\mathbf{R}} = \text{interp}(\mathbf{R}_\text{DVC}) \xrightarrow{\text{SVD}} \hat{\mathbf{R}} \in \mathrm{SO}(3)
+\]</div>
+<p>Voxels outside the DVC ROI are assigned the identity rotation
+(<span class="arithmatex">\(\mathbf{R} = \mathbf{I}\)</span>), meaning no lattice rotation is applied there.</p>
+<hr />
+<h2 id="references">References</h2>
+<ul>
+<li>Sutton M A <em>et al.</em> (2009). <em>Image Correlation for Shape, Motion and
+  Deformation Measurements.</em> Springer.</li>
+<li>Bonet J, Wood R D (2008). <em>Nonlinear Continuum Mechanics for Finite Element
+  Analysis</em>, 2nd ed. Cambridge University Press. (§3 — kinematics)</li>
+<li>Guizar-Sicairos M <em>et al.</em> (2011). <em>Phase tomography from x-ray coherent
+  diffractive imaging.</em> Physical Review Letters <strong>107</strong>, 022607.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../registration/" class="btn btn-neutral float-left" title="Image Registration"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../crystallography/" class="btn btn-neutral float-right" title="Crystal Orientations & IPF">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/pedrodamas0803/multimodal-registration" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../registration/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../crystallography/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../assets/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

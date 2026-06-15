@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://pedrodamas0803.github.io/multimodal-registration/theory/crystallography/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Crystal Orientations & IPF - multimodal-registration</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Crystal Orientations \u0026 IPF";
+        var mkdocs_page_input_path = "theory/crystallography.md";
+        var mkdocs_page_url = "/multimodal-registration/theory/crystallography/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> multimodal-registration
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Theory</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../registration/">Image Registration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../deformation/">Deformation & Rotations</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Crystal Orientations & IPF</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#orientation-representation">Orientation representation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#from-euler-angles-to-rotation-matrix">From Euler angles to rotation matrix</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#inverse-pole-figure-ipf">Inverse Pole Figure (IPF)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#step-1-project-into-crystal-frame">Step 1 — project into crystal frame</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-2-apply-crystal-symmetry">Step 2 — apply crystal symmetry</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-3-colour-assignment">Step 3 — colour assignment</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#updating-orientations-after-dvc">Updating orientations after DVC</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#rodrigues-vectors">Rodrigues vectors</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../guide/workflow/">Full Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../guide/interactive/">Interactive Registration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../guide/export/">Exporting Data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../guide/gpu/">GPU Acceleration</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../api/reference/">API Reference</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">multimodal-registration</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Theory</li>
+      <li class="breadcrumb-item active">Crystal Orientations & IPF</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/pedrodamas0803/multimodal-registration/edit/master/docs/theory/crystallography.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="crystal-orientations-ipf">Crystal Orientations &amp; IPF</h1>
+<h2 id="orientation-representation">Orientation representation</h2>
+<p>A crystal orientation describes how the crystal lattice frame is rotated
+relative to the sample (laboratory) frame.  The package follows the convention
+used by LabDCT / GrainMapper3D:</p>
+<ul>
+<li><strong>Bunge Euler angles</strong> <span class="arithmatex">\((\varphi_1,\, \Phi,\, \varphi_2)\)</span> — three
+  successive rotations about the ZXZ axes of the sample frame.</li>
+<li>Stored in <code>dct.EulerAngle</code> with shape <span class="arithmatex">\((N_\text{grains}, 3)\)</span> in degrees.</li>
+<li>Grain <code>gid</code> (1-based, MATLAB convention) maps to row <code>gid − 1</code>.</li>
+</ul>
+<h3 id="from-euler-angles-to-rotation-matrix">From Euler angles to rotation matrix</h3>
+<p>The Bunge rotation matrix <span class="arithmatex">\(\mathbf{g}\)</span> is the composition:</p>
+<div class="arithmatex">\[
+\mathbf{g} = \mathbf{R}_Z(\varphi_2)\,\mathbf{R}_X(\Phi)\,\mathbf{R}_Z(\varphi_1)
+\]</div>
+<p>It maps a direction <span class="arithmatex">\(\mathbf{d}\)</span> expressed in the <strong>crystal</strong> frame to the
+corresponding direction in the <strong>sample</strong> frame:</p>
+<div class="arithmatex">\[
+\mathbf{d}_\text{sample} = \mathbf{g}\,\mathbf{d}_\text{crystal}
+\]</div>
+<p>The inverse (transposed, since <span class="arithmatex">\(\mathbf{g} \in \mathrm{SO}(3)\)</span>) gives the
+crystal direction that corresponds to a given sample direction:</p>
+<div class="arithmatex">\[
+\mathbf{d}_\text{crystal} = \mathbf{g}^\top \mathbf{d}_\text{sample}
+\]</div>
+<hr />
+<h2 id="inverse-pole-figure-ipf">Inverse Pole Figure (IPF)</h2>
+<p>An Inverse Pole Figure maps a chosen <strong>sample reference direction</strong>
+(e.g. the loading axis <span class="arithmatex">\([001]\)</span>) into the <strong>crystal</strong> frame and assigns an
+RGB colour to the result.</p>
+<h3 id="step-1-project-into-crystal-frame">Step 1 — project into crystal frame</h3>
+<p>For the <span class="arithmatex">\([001]\)</span> IPF:</p>
+<div class="arithmatex">\[
+\mathbf{d} = \mathbf{g}^\top \begin{pmatrix}0\\0\\1\end{pmatrix}
+\]</div>
+<h3 id="step-2-apply-crystal-symmetry">Step 2 — apply crystal symmetry</h3>
+<p>Under cubic (m-3m) symmetry there are 48 equivalent directions.  The
+representative in the <strong>standard triangle</strong> (fundamental zone) is obtained by:</p>
+<ol>
+<li>Taking absolute values: <span class="arithmatex">\(\mathbf{d} \leftarrow |\mathbf{d}|\)</span>.</li>
+<li>Sorting the components in descending order: <span class="arithmatex">\(d_0 \geq d_1 \geq d_2 \geq 0\)</span>.</li>
+</ol>
+<p>The three corners of the standard triangle and their conventional colours are:</p>
+<table>
+<thead>
+<tr>
+<th>Direction</th>
+<th>Indices</th>
+<th>Colour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\([001]\)</span></td>
+<td><span class="arithmatex">\((1,0,0)\)</span> after reduction</td>
+<td>Blue</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\([101]\)</span></td>
+<td><span class="arithmatex">\((1,1,0)/\sqrt{2}\)</span></td>
+<td>Green</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\([111]\)</span></td>
+<td><span class="arithmatex">\((1,1,1)/\sqrt{3}\)</span></td>
+<td>Red</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Colour convention</p>
+<p>The exact colour mapping depends on the reconstruction software.
+The pre-computed <code>IPF001</code> stored in the DCT HDF5 reflects the convention
+of the MATLAB reconstruction code.  After a DVC rotation update the
+colours are recomputed by <strong>orix</strong>, which follows the MTEX convention.
+Verify visually that the two conventions match before comparing maps.</p>
+</div>
+<h3 id="step-3-colour-assignment">Step 3 — colour assignment</h3>
+<p>orix computes IPF colours using a stereographic projection of the fundamental
+triangle, normalising so that each corner maps to pure red, green, or blue
+and all intermediate orientations are interpolated linearly in the triangle.</p>
+<hr />
+<h2 id="updating-orientations-after-dvc">Updating orientations after DVC</h2>
+<p>When a DVC rotation <span class="arithmatex">\(\mathbf{R}\)</span> is applied to a grain with orientation
+<span class="arithmatex">\(\mathbf{g}\)</span>, the new orientation is:</p>
+<div class="arithmatex">\[
+\mathbf{g}_\text{new} = \mathbf{R}\,\mathbf{g}_\text{old}
+\]</div>
+<p>The crystal direction now aligned with the sample <span class="arithmatex">\([001]\)</span> axis becomes:</p>
+<div class="arithmatex">\[
+\mathbf{d}_\text{new} = \mathbf{g}_\text{new}^\top \begin{pmatrix}0\\0\\1\end{pmatrix}
+= \mathbf{g}_\text{old}^\top \mathbf{R}^\top \begin{pmatrix}0\\0\\1\end{pmatrix}
+\]</div>
+<p>Physically this means: the lattice rotation <span class="arithmatex">\(\mathbf{R}\)</span> tilts the crystal
+axes, so the sample <span class="arithmatex">\([001]\)</span> direction now points along a different crystal
+direction — the IPF colour changes accordingly.</p>
+<p>Because <span class="arithmatex">\(\mathbf{R}\)</span> varies <strong>spatially</strong> within the DVC field, different
+regions of the same grain can show slightly different colours in the updated
+IPF map, reflecting <strong>sub-grain orientation gradients</strong> introduced by the
+deformation.</p>
+<hr />
+<h2 id="rodrigues-vectors">Rodrigues vectors</h2>
+<p>Some DCT codes also store orientations as <strong>Rodrigues–Frank vectors</strong>
+(<code>dct.RodVec</code>), related to the rotation axis <span class="arithmatex">\(\hat{\mathbf{n}}\)</span> and angle
+<span class="arithmatex">\(\omega\)</span> by:</p>
+<div class="arithmatex">\[
+\mathbf{r} = \hat{\mathbf{n}}\tan\!\left(\frac{\omega}{2}\right)
+\]</div>
+<p>orix can convert these directly via <code>Rotation.from_axes_angles</code> after
+normalising, or via <code>Rotation.from_rodrigues</code> in older versions.</p>
+<hr />
+<h2 id="references">References</h2>
+<ul>
+<li>Bunge H J (1982). <em>Texture Analysis in Materials Science.</em> Butterworth.</li>
+<li>Nolze G, Hielscher R (2016). <em>Orientations — perfectly colored.</em>
+  Journal of Applied Crystallography <strong>49</strong>, 1786–1802.</li>
+<li>Bachmann F, Hielscher R, Schaeben H (2010). <em>Texture analysis with MTEX.</em>
+  Solid State Phenomena <strong>160</strong>, 63–68.</li>
+<li>orix documentation: <a href="https://orix.readthedocs.io">orix.readthedocs.io</a></li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../deformation/" class="btn btn-neutral float-left" title="Deformation & Rotations"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../guide/workflow/" class="btn btn-neutral float-right" title="Full Pipeline">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/pedrodamas0803/multimodal-registration" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../deformation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../guide/workflow/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../assets/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

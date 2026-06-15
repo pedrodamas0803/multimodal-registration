@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://pedrodamas0803.github.io/multimodal-registration/guide/export/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Exporting Data - multimodal-registration</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Exporting Data";
+        var mkdocs_page_input_path = "guide/export.md";
+        var mkdocs_page_url = "/multimodal-registration/guide/export/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> multimodal-registration
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Theory</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../theory/registration/">Image Registration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../theory/deformation/">Deformation & Rotations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../theory/crystallography/">Crystal Orientations & IPF</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../workflow/">Full Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../interactive/">Interactive Registration</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Exporting Data</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#format-overview">Format overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#hdf5">HDF5</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#vtk">VTK</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dream3d">DREAM.3D</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#what-is-written">What is written</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#opening-in-paraview">Opening in ParaView</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#format-dispatcher">Format dispatcher</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gpu/">GPU Acceleration</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../api/reference/">API Reference</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">multimodal-registration</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+      <li class="breadcrumb-item active">Exporting Data</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/pedrodamas0803/multimodal-registration/edit/master/docs/guide/export.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="exporting-data">Exporting Data</h1>
+<p>After registration and deformation, results can be exported to three formats
+for downstream visualisation and analysis.</p>
+<h2 id="format-overview">Format overview</h2>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Extension</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HDF5</td>
+<td><code>.h5</code></td>
+<td>Lossless archive of all arrays; re-loadable by the package</td>
+</tr>
+<tr>
+<td>VTK</td>
+<td><code>.vts</code></td>
+<td>ParaView, DREAM.3D plugin, any VTK-compatible viewer</td>
+</tr>
+<tr>
+<td>DREAM.3D</td>
+<td><code>.dream3d</code></td>
+<td>DREAM.3D GUI, DREAM.3D ParaView plugin</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="hdf5">HDF5</h2>
+<p>Writes DCT, PCT and DVC data into a single file under logical groups:</p>
+<pre class="highlight"><code>/DCT/DS/&lt;key&gt;      — all arrays loaded from the original DCT HDF5
+/PCT/vol           — grey-level volume
+/PCT/mask          — Otsu binary mask
+/DVC/displacement  — (nx, ny, nz, 3) displacement field
+/DVC/strain/&lt;key&gt;  — strain fields (if present)
+/DVC/origin        — ROI origin in PCT voxel space
+/DVC/spacing       — DVC grid spacing</code></pre>
+<pre class="highlight"><code class="language-python">from multimodal_registration import write_h5
+
+write_h5("results.h5", dct=dct, pct=pct, dvc=dvc)
+
+# Or use the dispatcher
+from multimodal_registration import write
+write("results.h5", dct=dct, pct=pct, dvc=dvc)</code></pre>
+<hr />
+<h2 id="vtk">VTK</h2>
+<p>Writes uniform-grid (ImageData) VTK files readable by ParaView and DREAM.3D.
+When both DCT and DVC are supplied, two files are created automatically:
+<code>results_dct.vts</code> and <code>results_dvc.vts</code>.</p>
+<pre class="highlight"><code class="language-python">from multimodal_registration import write_vtk
+
+# Both — produces results_dct.vts and results_dvc.vts
+write_vtk("results.vts", dct=dct, dvc=dvc)
+
+# DCT only
+write_vtk("dct.vts", dct=dct)
+
+# DVC only
+write_vtk("dvc.vts", dvc=dvc)</code></pre>
+<p>All volumetric arrays in the DCT object (<code>GIDvol</code>, <code>Mask</code>, <code>IPF001</code>, …)
+are written as point data.  DVC displacement and strain fields are written
+to the DVC file on their own grid (with the correct <code>origin</code> and <code>spacing</code>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Requires pyvista: <code>pip install "multimodal-registration[vtk]"</code></p>
+</div>
+<hr />
+<h2 id="dream3d">DREAM.3D</h2>
+<p>Produces a DREAM.3D 6.x compatible <code>.dream3d</code> file (HDF5 with a strict
+internal structure) that can be opened directly in the DREAM.3D application
+or via the DREAM.3D ParaView plugin.</p>
+<pre class="highlight"><code class="language-python">from multimodal_registration import write_dream3d
+
+write_dream3d("results.dream3d", dct=dct, euler_degrees=True)</code></pre>
+<h3 id="what-is-written">What is written</h3>
+<table>
+<thead>
+<tr>
+<th>DREAM.3D path</th>
+<th>Source</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CellData/FeatureIds</code></td>
+<td><code>dct.GIDvol</code></td>
+<td>Grain IDs, 1-based</td>
+</tr>
+<tr>
+<td><code>CellData/EulerAngles</code></td>
+<td><code>dct.EulerAngle</code> + <code>dct.GIDvol</code></td>
+<td>Per-voxel, radians</td>
+</tr>
+<tr>
+<td><code>CellData/IPFColors</code></td>
+<td><code>dct.IPF001</code></td>
+<td>uint8 RGB</td>
+</tr>
+<tr>
+<td><code>CellData/Mask</code></td>
+<td><code>dct.Mask</code></td>
+<td>uint8</td>
+</tr>
+<tr>
+<td><code>CellData/Phases</code></td>
+<td>constant <code>phase_id</code></td>
+<td>Default 1</td>
+</tr>
+<tr>
+<td><code>CellFeatureData/EulerAngles</code></td>
+<td><code>dct.EulerAngle</code></td>
+<td>Per-grain, radians</td>
+</tr>
+<tr>
+<td><code>CellFeatureData/Active</code></td>
+<td>derived</td>
+<td>All grains active</td>
+</tr>
+<tr>
+<td><code>_SIMPL_GEOMETRY</code></td>
+<td><code>dct.voxel_size</code></td>
+<td>ImageGeometry</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Euler angle convention</p>
+<p>DREAM.3D expects Euler angles in <strong>radians</strong> (Bunge ZXZ).  The writer
+converts from degrees automatically when <code>euler_degrees=True</code> (default).</p>
+</div>
+<h3 id="opening-in-paraview">Opening in ParaView</h3>
+<ol>
+<li>Open ParaView and load the <code>.dream3d</code> file via
+   <strong>File → Open</strong> (the DREAM.3D reader is built into ParaView ≥ 5.10).</li>
+<li>In the pipeline browser, apply the reader and select which arrays to
+   display (<code>FeatureIds</code>, <code>IPFColors</code>, etc.).</li>
+<li>To overlay DVC results, load the <code>_dvc.vts</code> file as a separate source
+   and use a <strong>Resample To Image</strong> or <strong>Probe Location</strong> filter to compare
+   on the same grid.</li>
+</ol>
+<hr />
+<h2 id="format-dispatcher">Format dispatcher</h2>
+<p><code>write()</code> infers the format from the file extension:</p>
+<pre class="highlight"><code class="language-python">from multimodal_registration import write
+
+write("results.h5",      dct=dct, pct=pct, dvc=dvc)
+write("results.vts",     dct=dct, dvc=dvc)
+write("results.dream3d", dct=dct)</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../interactive/" class="btn btn-neutral float-left" title="Interactive Registration"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../gpu/" class="btn btn-neutral float-right" title="GPU Acceleration">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/pedrodamas0803/multimodal-registration" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../interactive/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../gpu/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../assets/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

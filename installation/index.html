@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://pedrodamas0803.github.io/multimodal-registration/installation/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Installation - multimodal-registration</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Installation";
+        var mkdocs_page_input_path = "installation.md";
+        var mkdocs_page_url = "/multimodal-registration/installation/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> multimodal-registration
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Installation</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#setting-up-an-environment">Setting up an environment</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#using-uv-recommended">Using uv (recommended)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#using-conda-mamba">Using conda / mamba</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#power9-ppc64le-eg-esrf-p9-cluster">POWER9 / ppc64le (e.g. ESRF p9 cluster)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#optional-extras">Optional extras</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#verifying-the-install">Verifying the install</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Theory</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../theory/registration/">Image Registration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../theory/deformation/">Deformation & Rotations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../theory/crystallography/">Crystal Orientations & IPF</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../guide/workflow/">Full Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../guide/interactive/">Interactive Registration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../guide/export/">Exporting Data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../guide/gpu/">GPU Acceleration</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api/reference/">API Reference</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">multimodal-registration</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Installation</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/pedrodamas0803/multimodal-registration/edit/master/docs/installation.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="installation">Installation</h1>
+<h2 id="requirements">Requirements</h2>
+<ul>
+<li>Python ≥ 3.10</li>
+</ul>
+<hr />
+<h2 id="setting-up-an-environment">Setting up an environment</h2>
+<h3 id="using-uv-recommended">Using uv (recommended)</h3>
+<p><a href="https://github.com/astral-sh/uv">uv</a> is a fast, all-in-one Python package
+and project manager.</p>
+<p><strong>Install uv</strong> (if you don't have it):</p>
+<pre class="highlight"><code class="language-bash"># macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"</code></pre>
+<p><strong>Create and activate the environment:</strong></p>
+<pre class="highlight"><code class="language-bash"># Create a virtual environment with Python 3.10
+uv venv --python 3.10 .venv
+
+# Activate — macOS / Linux
+source .venv/bin/activate
+
+# Activate — Windows
+.venv\Scripts\activate</code></pre>
+<p><strong>Install the package:</strong></p>
+<pre class="highlight"><code class="language-bash"># Core only
+uv pip install multimodal-registration
+
+# With extras
+uv pip install "multimodal-registration[vtk,jupyter,crystal]"
+
+# GPU (pick your CUDA version)
+uv pip install "multimodal-registration[cuda12,vtk,jupyter,crystal]"</code></pre>
+<div class="admonition note">
+<p class="admonition-title">Working from source</p>
+<p>If you cloned the repository, use <code>uv sync</code> instead — it reads
+<code>pyproject.toml</code> and installs everything declared there in one step:</p>
+<pre class="highlight"><code class="language-bash">git clone https://github.com/damasres/multimodal-registration
+cd multimodal-registration
+uv sync --all-extras --group docs</code></pre>
+</div>
+<hr />
+<h3 id="using-conda-mamba">Using conda / mamba</h3>
+<p><a href="https://docs.conda.io">conda</a> (or the faster drop-in
+<a href="https://mamba.readthedocs.io">mamba</a>) works well when you also need
+non-Python dependencies or want integration with an existing Anaconda setup.</p>
+<p><strong>Create and activate the environment:</strong></p>
+<pre class="highlight"><code class="language-bash">conda create -n multimodal-reg python=3.10
+conda activate multimodal-reg</code></pre>
+<p><strong>Install core dependencies from conda-forge</strong> (recommended for compiled
+packages such as h5py and scipy):</p>
+<pre class="highlight"><code class="language-bash">conda install -c conda-forge numpy scipy h5py scikit-image matplotlib</code></pre>
+<p><strong>Install the package with pip:</strong></p>
+<pre class="highlight"><code class="language-bash">pip install multimodal-registration
+
+# With extras
+pip install "multimodal-registration[vtk,jupyter,crystal]"</code></pre>
+<div class="admonition note">
+<p class="admonition-title">CuPy on conda</p>
+<p>For GPU support, install CuPy from conda-forge rather than PyPI —
+it links against the conda CUDA toolkit automatically:</p>
+<pre class="highlight"><code class="language-bash">conda install -c conda-forge cupy cucim</code></pre>
+</div>
+<p><strong>Save and recreate the environment:</strong></p>
+<pre class="highlight"><code class="language-bash"># Export
+conda env export &gt; environment.yml
+
+# Recreate on another machine
+conda env create -f environment.yml</code></pre>
+<hr />
+<h3 id="power9-ppc64le-eg-esrf-p9-cluster">POWER9 / ppc64le (e.g. ESRF p9 cluster)</h3>
+<p>On <code>ppc64le</code> machines several PyPI packages have no pre-built wheels, so
+<strong>uv is not usable</strong> on this architecture.  Use mamba with the provided
+<code>environment-p9.yml</code> instead, which pins the versions known to work.</p>
+<p><strong>Install micromamba</strong> (no root needed):</p>
+<pre class="highlight"><code class="language-bash">"${SHELL}" &lt;(curl -L micro.mamba.pm/install.sh)
+# or, if curl is unavailable:
+wget -qO- micro.mamba.pm/install.sh | bash</code></pre>
+<p><strong>Create the environment</strong> (user-local, no admin rights required):</p>
+<pre class="highlight"><code class="language-bash">mamba env create --prefix ~/.conda/envs/multimodal-reg \
+    -f environment-p9.yml
+mamba activate ~/.conda/envs/multimodal-reg</code></pre>
+<p><strong>Install the project in editable mode:</strong></p>
+<pre class="highlight"><code class="language-bash">pip install -e /path/to/multimodal-registration --no-deps</code></pre>
+<p><strong>GPU support</strong> — CuPy must come from conda-forge (no ppc64le wheels on PyPI),
+and cucim is unavailable on this architecture:</p>
+<pre class="highlight"><code class="language-bash"># Check your CUDA version first
+nvidia-smi | head -3
+
+mamba install -c conda-forge cupy -y</code></pre>
+<p><strong>VTK / PyVista</strong> — also conda-forge only on ppc64le:</p>
+<pre class="highlight"><code class="language-bash">mamba install -c conda-forge pyvista -y</code></pre>
+<p><strong>Register the Jupyter kernel:</strong></p>
+<pre class="highlight"><code class="language-bash">python -m ipykernel install --user \
+    --name multimodal-reg-p9 \
+    --display-name "multimodal-reg (p9 GPU)"</code></pre>
+<details class="note">
+<summary>Version constraints on ppc64le</summary>
+<ul>
+<li><strong>ipympl</strong> is pinned to <code>0.9.8</code>. Higher versions are not available on
+  conda-forge for this architecture. If your JupyterHub shows a
+  <em>"module not registered"</em> warning, it means the server's
+  <code>jupyter-matplotlib</code> extension version does not match — ask your
+  sysadmin to update it, or keep the pin and ignore the warning.</li>
+<li><strong>matplotlib</strong> is pinned to <code>&lt;3.9</code>. Matplotlib 3.9+ changed internal
+  event dispatching in a way that breaks interactive click events with
+  ipympl 0.9.x.</li>
+<li><strong>h5py</strong> and <strong>scipy</strong> must come from conda-forge because the system
+  HDF5 library on ppc64le nodes is typically too old to build h5py from
+  source.</li>
+</ul>
+</details>
+<hr />
+<h2 id="optional-extras">Optional extras</h2>
+<table>
+<thead>
+<tr>
+<th>Extra</th>
+<th>Packages added</th>
+<th>Required for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cuda11</code> / <code>cuda12</code></td>
+<td><code>cupy</code>, <code>cucim</code></td>
+<td>GPU-accelerated zoom, shift, cross-correlation</td>
+</tr>
+<tr>
+<td><code>vtk</code></td>
+<td><code>pyvista</code></td>
+<td>Loading <code>.vtk</code> / <code>.vts</code> / <code>.vtu</code> DVC files</td>
+</tr>
+<tr>
+<td><code>jupyter</code></td>
+<td><code>ipywidgets</code>, <code>ipympl</code></td>
+<td>Interactive overlay in notebooks</td>
+</tr>
+<tr>
+<td><code>crystal</code></td>
+<td><code>orix</code></td>
+<td>Rotating grain orientations and recomputing IPF colours</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="verifying-the-install">Verifying the install</h2>
+<pre class="highlight"><code class="language-python">import multimodal_registration as mr
+print(mr.backend_name())   # 'cuda' or 'cpu'</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../theory/registration/" class="btn btn-neutral float-right" title="Image Registration">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/pedrodamas0803/multimodal-registration" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../theory/registration/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../assets/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
