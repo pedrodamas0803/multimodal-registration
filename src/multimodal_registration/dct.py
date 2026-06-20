@@ -141,15 +141,19 @@ class DCT:
 
             padded_shape = tuple(s + b + a for s, (b, a) in zip(arr.shape, pw))
 
-            # Write directly into a memmap — the padded array is never fully
-            # loaded into RAM; the OS pages it in/out as the slice is filled.
+            # Copy source data before creating the new memmap: the padded
+            # memmap uses the same backing file as arr (mode="w+" truncates it),
+            # so arr must be read into memory first or the source becomes zeros.
+            data = np.array(arr)
+            del arr
+
             path = os.path.join(self._tmpdir.name, f"{key}.dat")
-            mm = np.memmap(path, dtype=arr.dtype, mode="w+", shape=padded_shape)
-            slices = tuple(slice(b, b + s) for (b, _), s in zip(pw, arr.shape))
-            mm[slices] = arr
+            mm = np.memmap(path, dtype=data.dtype, mode="w+", shape=padded_shape)
+            slices = tuple(slice(b, b + s) for (b, _), s in zip(pw, data.shape))
+            mm[slices] = data
             mm.flush()
 
-            del arr
+            del data
             gc.collect()
             setattr(self, key, mm)
 
