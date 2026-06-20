@@ -2,9 +2,21 @@ site_name: multimodal-registration
 site_description: 3-D multimodal image registration for DCT and PCT volumes
 site_url: https://pedrodamas0803.github.io/multimodal-registration/
 repo_url: https://github.com/pedrodamas0803/multimodal-registration
+repo_name: pedrodamas0803/multimodal-registration
 
 theme:
-  name: readthedocs
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
 
 nav:
   - Home: index.md
