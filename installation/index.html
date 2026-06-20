@@ -1041,8 +1041,8 @@ and project manager.</p>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># With extras</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;multimodal-registration[vtk,jupyter,crystal]&quot;</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># GPU (pick your CUDA version)</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;multimodal-registration[cuda12,vtk,jupyter,crystal]&quot;</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># GPU (CUDA 11)</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;multimodal-registration[cuda11,vtk,jupyter,crystal]&quot;</span>
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Working from source</p>
@@ -1057,38 +1057,47 @@ and project manager.</p>
 with the shell prompt <code>(registration)</code>.  Skip it if you don't mind the
 default prompt (<code>multimodal-registration</code>).</p>
 </div>
+<p><strong>Register the Jupyter kernel</strong> (requires the <code>jupyter</code> extra):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>ipykernel<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span>--name<span class="w"> </span>registration<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>--display-name<span class="w"> </span><span class="s2">&quot;Python (registration)&quot;</span>
+</code></pre></div>
+<p>After this, the kernel appears as <strong>Python (registration)</strong> in JupyterLab,
+Jupyter Notebook, and VS Code. To remove it later:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>jupyter<span class="w"> </span>kernelspec<span class="w"> </span>remove<span class="w"> </span>registration
+</code></pre></div>
 <hr />
 <h3 id="using-conda-mamba">Using conda / mamba</h3>
 <p><a href="https://docs.conda.io">conda</a> (or the faster drop-in
 <a href="https://mamba.readthedocs.io">mamba</a>) works well when you also need
 non-Python dependencies or want integration with an existing Anaconda setup.</p>
 <p><strong>Create and activate the environment:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>multimodal-reg<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.10
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>conda<span class="w"> </span>activate<span class="w"> </span>multimodal-reg
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>multimodal-reg<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.10
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>conda<span class="w"> </span>activate<span class="w"> </span>multimodal-reg
 </code></pre></div>
 <p><strong>Install core dependencies from conda-forge</strong> (recommended for compiled
 packages such as h5py and scipy):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>numpy<span class="w"> </span>scipy<span class="w"> </span>h5py<span class="w"> </span>scikit-image<span class="w"> </span>matplotlib
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>numpy<span class="w"> </span>scipy<span class="w"> </span>h5py<span class="w"> </span>scikit-image<span class="w"> </span>matplotlib
 </code></pre></div>
 <p><strong>Install the package with pip:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span>multimodal-registration
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># With extras</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;multimodal-registration[vtk,jupyter,crystal]&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>install<span class="w"> </span>multimodal-registration
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="c1"># With extras</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;multimodal-registration[vtk,jupyter,crystal]&quot;</span>
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">CuPy on conda</p>
 <p>For GPU support, install CuPy from conda-forge rather than PyPI —
 it links against the conda CUDA toolkit automatically:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>cupy<span class="w"> </span>cucim
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>cupy<span class="w"> </span>cucim
 </code></pre></div>
 </div>
 <p><strong>Save and recreate the environment:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Export</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>conda<span class="w"> </span>env<span class="w"> </span><span class="nb">export</span><span class="w"> </span>&gt;<span class="w"> </span>environment.yml
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Recreate on another machine</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Export</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>conda<span class="w"> </span>env<span class="w"> </span><span class="nb">export</span><span class="w"> </span>&gt;<span class="w"> </span>environment.yml
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Recreate on another machine</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yml
 </code></pre></div>
 <hr />
 <h3 id="power9-ppc64le-eg-esrf-p9-cluster">POWER9 / ppc64le (e.g. ESRF p9 cluster)</h3>
@@ -1096,32 +1105,32 @@ it links against the conda CUDA toolkit automatically:</p>
 <strong>uv is not usable</strong> on this architecture.  Use mamba with the provided
 <code>environment-p9.yml</code> instead, which pins the versions known to work.</p>
 <p><strong>Install micromamba</strong> (no root needed):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SHELL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-L<span class="w"> </span>micro.mamba.pm/install.sh<span class="o">)</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="c1"># or, if curl is unavailable:</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>wget<span class="w"> </span>-qO-<span class="w"> </span>micro.mamba.pm/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SHELL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-L<span class="w"> </span>micro.mamba.pm/install.sh<span class="o">)</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="c1"># or, if curl is unavailable:</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>wget<span class="w"> </span>-qO-<span class="w"> </span>micro.mamba.pm/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
 </code></pre></div>
 <p><strong>Create the environment</strong> (user-local, no admin rights required):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>mamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>--prefix<span class="w"> </span>~/.conda/envs/multimodal-reg<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span>-f<span class="w"> </span>environment-p9.yml
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>mamba<span class="w"> </span>activate<span class="w"> </span>~/.conda/envs/multimodal-reg
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>mamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>--prefix<span class="w"> </span>~/.conda/envs/multimodal-reg<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span>-f<span class="w"> </span>environment-p9.yml
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>mamba<span class="w"> </span>activate<span class="w"> </span>~/.conda/envs/multimodal-reg
 </code></pre></div>
 <p><strong>Install the project in editable mode:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>/path/to/multimodal-registration<span class="w"> </span>--no-deps
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>/path/to/multimodal-registration<span class="w"> </span>--no-deps
 </code></pre></div>
 <p><strong>GPU support</strong> — CuPy must come from conda-forge (no ppc64le wheels on PyPI),
 and cucim is unavailable on this architecture:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Check your CUDA version first</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>nvidia-smi<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-3
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>mamba<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>cupy<span class="w"> </span>-y
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Check your CUDA version first</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>nvidia-smi<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-3
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>mamba<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>cupy<span class="w"> </span>-y
 </code></pre></div>
 <p><strong>VTK / PyVista</strong> — also conda-forge only on ppc64le:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>mamba<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pyvista<span class="w"> </span>-y
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>mamba<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pyvista<span class="w"> </span>-y
 </code></pre></div>
 <p><strong>Register the Jupyter kernel:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>python<span class="w"> </span>-m<span class="w"> </span>ipykernel<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span>--name<span class="w"> </span>multimodal-reg-p9<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span>--display-name<span class="w"> </span><span class="s2">&quot;multimodal-reg (p9 GPU)&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>python<span class="w"> </span>-m<span class="w"> </span>ipykernel<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span>--name<span class="w"> </span>multimodal-reg-p9<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span>--display-name<span class="w"> </span><span class="s2">&quot;multimodal-reg (p9 GPU)&quot;</span>
 </code></pre></div>
 <details class="note">
 <summary>Version constraints on ppc64le</summary>
@@ -1151,7 +1160,7 @@ and cucim is unavailable on this architecture:</p>
 </thead>
 <tbody>
 <tr>
-<td><code>cuda11</code> / <code>cuda12</code></td>
+<td><code>cuda11</code></td>
 <td><code>cupy</code>, <code>cucim</code></td>
 <td>GPU-accelerated zoom, shift, cross-correlation</td>
 </tr>
@@ -1174,8 +1183,8 @@ and cucim is unavailable on this architecture:</p>
 </table>
 <hr />
 <h2 id="verifying-the-install">Verifying the install</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">multimodal_registration</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mr</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">mr</span><span class="o">.</span><span class="n">backend_name</span><span class="p">())</span>   <span class="c1"># &#39;cuda&#39; or &#39;cpu&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">multimodal_registration</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mr</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">mr</span><span class="o">.</span><span class="n">backend_name</span><span class="p">())</span>   <span class="c1"># &#39;cuda&#39; or &#39;cpu&#39;</span>
 </code></pre></div>
 
 
