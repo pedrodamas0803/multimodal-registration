@@ -45,8 +45,8 @@ uv pip install multimodal-registration
 # With extras
 uv pip install "multimodal-registration[vtk,jupyter,crystal]"
 
-# GPU (pick your CUDA version)
-uv pip install "multimodal-registration[cuda12,vtk,jupyter,crystal]"
+# GPU (CUDA 11)
+uv pip install "multimodal-registration[cuda11,vtk,jupyter,crystal]"
 ```
 
 !!! note "Working from source"
@@ -63,6 +63,21 @@ uv pip install "multimodal-registration[cuda12,vtk,jupyter,crystal]"
     The `uv venv --prompt registration` step creates the virtual environment
     with the shell prompt `(registration)`.  Skip it if you don't mind the
     default prompt (`multimodal-registration`).
+
+**Register the Jupyter kernel** (requires the `jupyter` extra):
+
+```bash
+uv run python -m ipykernel install --user \
+    --name registration \
+    --display-name "Python (registration)"
+```
+
+After this, the kernel appears as **Python (registration)** in JupyterLab,
+Jupyter Notebook, and VS Code. To remove it later:
+
+```bash
+jupyter kernelspec remove registration
+```
 
 ---
 
@@ -186,7 +201,7 @@ python -m ipykernel install --user \
 
 | Extra | Packages added | Required for |
 |-------|---------------|--------------|
-| `cuda11` / `cuda12` | `cupy`, `cucim` | GPU-accelerated zoom, shift, cross-correlation |
+| `cuda11` | `cupy`, `cucim` | GPU-accelerated zoom, shift, cross-correlation |
 | `vtk` | `pyvista` | Loading `.vtk` / `.vts` / `.vtu` DVC files |
 | `jupyter` | `ipywidgets`, `ipympl` | Interactive overlay in notebooks |
 | `crystal` | `orix` | Rotating grain orientations and recomputing IPF colours |
