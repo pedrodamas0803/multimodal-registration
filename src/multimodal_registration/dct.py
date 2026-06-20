@@ -81,21 +81,20 @@ class DCT:
     # Volumetric operations
     # ------------------------------------------------------------------
 
-    def upscale(self, target_vox_size: float) -> None:
-        """Upscale all 3-D volumes in-place to match *target_vox_size*.
+    def upscale(self, factor: float) -> None:
+        """Upscale all 3-D volumes in-place by *factor*.
 
-        The zoom factor is ``self.voxel_size / target_vox_size``.
         Integer arrays (grain IDs, masks) use nearest-neighbour
         interpolation (``order=0``); float/RGB arrays use linear
         interpolation (``order=1``).
 
         Parameters
         ----------
-        target_vox_size:
-            Voxel size of the reference volume (e.g. PCT voxel size in µm).
+        factor:
+            Zoom factor to apply along each spatial axis (e.g. 2.0 doubles
+            the resolution). Typically ``dct.voxel_size / pct.voxel_size``.
         """
         nd = backends.ndimage()
-        factor = self.voxel_size / target_vox_size
 
         for key in self._vol_keys:
             arr: np.ndarray = getattr(self, key)
@@ -116,7 +115,7 @@ class DCT:
             del zoomed
             gc.collect()
 
-        self.voxel_size = target_vox_size
+        self.voxel_size /= factor
         self.shape = self.GIDvol.shape
 
     def pad(self, target_shape: tuple[int, int, int]) -> None:
