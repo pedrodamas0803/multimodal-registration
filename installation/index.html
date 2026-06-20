@@ -1048,10 +1048,14 @@ and project manager.</p>
 <p class="admonition-title">Working from source</p>
 <p>If you cloned the repository, use <code>uv sync</code> instead — it reads
 <code>pyproject.toml</code> and installs everything declared there in one step:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/damasres/multimodal-registration
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/pedrodamas0803/multimodal-registration
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">cd</span><span class="w"> </span>multimodal-registration
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>uv<span class="w"> </span>sync<span class="w"> </span>--all-extras<span class="w"> </span>--group<span class="w"> </span>docs
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>uv<span class="w"> </span>venv<span class="w"> </span>--prompt<span class="w"> </span>registration
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>uv<span class="w"> </span>sync<span class="w"> </span>--all-extras
 </code></pre></div>
+<p>The <code>uv venv --prompt registration</code> step creates the virtual environment
+with the shell prompt <code>(registration)</code>.  Skip it if you don't mind the
+default prompt (<code>multimodal-registration</code>).</p>
 </div>
 <hr />
 <h3 id="using-conda-mamba">Using conda / mamba</h3>
