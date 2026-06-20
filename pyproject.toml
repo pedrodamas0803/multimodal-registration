@@ -20,18 +20,18 @@ vtk = ["pyvista>=0.43"]
 # Interactive PyVista rendering inside Jupyter (replaces static fallback)
 trame = ["trame>=3.0", "trame-vtk>=2.6", "trame-vuetify>=2.3", "nest-asyncio>=1.6"]
 # Jupyter interactive registration UI
-jupyter = ["ipywidgets>=8.0", "ipympl==0.9.8"]
+jupyter = ["ipykernel>=6.0", "ipywidgets>=8.0", "ipympl==0.9.8"]
 # Crystallographic orientation maths (IPF update after DVC)
 crystal = ["orix>=0.12"]
 # NVIDIA GPU acceleration — pick the wheel matching your CUDA version:
 #   pip install "multimodal-registration[cuda12]"
 cuda11 = [
-    "cupy-cuda11x>=12.0; platform_machine != 'ppc64le'",
-    "cucim-cu11>=23.0; platform_machine != 'ppc64le'",
+    "cupy-cuda11x>=12.0; platform_machine != 'ppc64le' and sys_platform == 'linux'",
+    "cucim-cu11>=23.0; platform_machine != 'ppc64le' and sys_platform == 'linux'",
 ]
 cuda12 = [
-    "cupy-cuda12x>=12.0; platform_machine != 'ppc64le'",
-    "cucim-cu12>=23.0; platform_machine != 'ppc64le'",
+    "cupy-cuda12x>=12.0; platform_machine != 'ppc64le' and sys_platform == 'linux'",
+    "cucim-cu12>=23.0; platform_machine != 'ppc64le' and sys_platform == 'linux'",
 ]
 # Everything except GPU — convenient for a full CPU install
 all = [
@@ -40,6 +40,7 @@ all = [
     "trame-vtk>=2.6",
     "trame-vuetify>=2.3",
     "nest-asyncio>=1.6",
+    "ipykernel>=6.0",
     "ipywidgets>=8.0",
     "ipympl==0.9.8",
     "orix>=0.12",

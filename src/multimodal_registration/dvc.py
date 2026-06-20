@@ -763,7 +763,7 @@ class DVCMesh:
         if origin is None:
             origin = float(cn.mean())
         if thickness is None:
-            extent_px = float(cn.ptp())
+            extent_px = float(np.ptp(cn))
             n_layers = max(round(self.n_elems ** (1 / 3)), 1)
             thickness = 1.5 * extent_px / n_layers
 
@@ -1075,7 +1075,7 @@ class DVCMesh:
 
             # Slice at mean query-point position along the normal
             slice_origin = float(np.mean(coords[:, ni]))
-            extent_n = float(cn.ptp())
+            extent_n = float(np.ptp(cn))
             n_layers = max(round(self.n_elems ** (1 / 3)), 1)
             thickness = 1.5 * extent_n / n_layers
             mask = np.abs(cn - slice_origin) <= thickness / 2
@@ -1100,8 +1100,8 @@ class DVCMesh:
 
                 # Pin axes limits to the mesh region BEFORE plotting the star
                 # so the star never stretches the view beyond the mesh bounds.
-                pad_h = 0.05 * max(xi.ptp(), 1.0)
-                pad_v = 0.05 * max(yi.ptp(), 1.0)
+                pad_h = 0.05 * max(np.ptp(xi), 1.0)
+                pad_v = 0.05 * max(np.ptp(yi), 1.0)
                 axins.set_xlim(xi.min() - pad_h, xi.max() + pad_h)
                 axins.set_ylim(yi.min() - pad_v, yi.max() + pad_v)
 
