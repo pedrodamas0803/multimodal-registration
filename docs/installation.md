@@ -54,10 +54,15 @@ uv pip install "multimodal-registration[cuda12,vtk,jupyter,crystal]"
     `pyproject.toml` and installs everything declared there in one step:
 
     ```bash
-    git clone https://github.com/damasres/multimodal-registration
+    git clone https://github.com/pedrodamas0803/multimodal-registration
     cd multimodal-registration
-    uv sync --all-extras --group docs
+    uv venv --prompt registration
+    uv sync --all-extras
     ```
+
+    The `uv venv --prompt registration` step creates the virtual environment
+    with the shell prompt `(registration)`.  Skip it if you don't mind the
+    default prompt (`multimodal-registration`).
 
 ---
 
