@@ -294,7 +294,7 @@ def update_ipf(
         from orix.plot import IPFColorKey
     except ImportError:
         try:
-            from orix.plot.colors import IPFColorKey
+            from orix.plot.colors import IPFColorKey  # type: ignore
         except ImportError as e:
             raise ImportError(
                 "Could not import IPFColorKey from orix.  "

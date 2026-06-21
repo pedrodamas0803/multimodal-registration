@@ -77,12 +77,9 @@ class DCT:
             arr = getattr(self, key)
             meta["fields"][key] = {"dtype": arr.dtype.str, "shape": list(arr.shape)}
             dst = os.path.join(directory, f"{key}.dat")
-            if hasattr(arr, "filename") and os.path.abspath(arr.filename) == os.path.abspath(dst):
-                arr.flush()
-            else:
-                mm = np.memmap(dst, dtype=arr.dtype, mode="w+", shape=arr.shape)
-                mm[:] = arr
-                mm.flush()
+            mm = np.memmap(dst, dtype=arr.dtype, mode="w+", shape=arr.shape)
+            mm[:] = arr
+            mm.flush()
 
         attrs = {k: getattr(self, k) for k in self._attr_keys}
         if attrs:
