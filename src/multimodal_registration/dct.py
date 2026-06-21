@@ -4,7 +4,8 @@ import gc
 import json
 import os
 import tempfile
-from concurrent.futures import ThreadPoolExecutor
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import numpy as np
 import h5py
@@ -188,50 +189,91 @@ class DCT:
         nd = backends.ndimage()
         keys_to_zoom = self._vol_keys if keys is None else [k for k in keys if k in self._vol_keys]
 
-        def _zoom_key(key: str) -> None:
-            arr: np.ndarray = getattr(self, key)
-            order = 0 if np.issubdtype(arr.dtype, np.integer) else 1
-            if arr.ndim == 3:
-                zf = [factor, factor, factor]
-            elif arr.ndim == 4:
-                # Last axis is a channel (e.g. RGB colour) — do not zoom it.
-                zf = [factor, factor, factor, 1.0]
-            else:
-                return
-            d_arr = backends.to_device(arr.astype(float) if order > 0 else arr)
-            zoomed = backends.to_numpy(nd.zoom(d_arr, zf, order=order))
-            del d_arr
-            setattr(self, key, self._to_memmap(key, zoomed))
-            del zoomed
-            gc.collect()
+        def _zoom_3d(arr_3d: np.ndarray, order: int) -> np.ndarray:
+            d = backends.to_device(arr_3d.astype(float) if order > 0 else arr_3d)
+            return backends.to_numpy(nd.zoom(d, [factor, factor, factor], order=order))
 
         if backends.backend_name() == "cuda":
             # GPU already parallelises within each kernel; keep sequential to
             # avoid multi-thread CuPy stream conflicts.
             for key in keys_to_zoom:
-                _zoom_key(key)
+                arr: np.ndarray = getattr(self, key)
+                order = 0 if np.issubdtype(arr.dtype, np.integer) else 1
+                if arr.ndim == 3:
+                    zoomed = _zoom_3d(arr, order)
+                elif arr.ndim == 4:
+                    zoomed = np.stack(
+                        [_zoom_3d(arr[..., c], order) for c in range(arr.shape[-1])],
+                        axis=-1,
+                    )
+                else:
+                    continue
+                setattr(self, key, self._to_memmap(key, zoomed))
+                del zoomed
+                gc.collect()
         else:
-            # scipy.ndimage.zoom releases the GIL — threads give real CPU
-            # parallelism. Cap workers to avoid excessive peak RAM usage.
-            n_workers = min(len(keys_to_zoom), os.cpu_count() or 1, 4)
+            # Flatten all work to 3-D tasks — 3-D fields and individual
+            # channels of 4-D fields all compete for the same workers.
+            # scipy.ndimage.zoom releases the GIL so threads run in parallel.
+            tasks: list[tuple[str, int | None]] = []
+            for key in keys_to_zoom:
+                arr = getattr(self, key)
+                if arr.ndim == 3:
+                    tasks.append((key, None))
+                elif arr.ndim == 4:
+                    for c in range(arr.shape[-1]):
+                        tasks.append((key, c))
+
+            n_workers = min(len(tasks), os.cpu_count() or 1)
+            channel_buf: dict[str, dict[int, np.ndarray]] = defaultdict(dict)
+
             with ThreadPoolExecutor(max_workers=n_workers) as pool:
-                list(pool.map(_zoom_key, keys_to_zoom))
+                future_to_task = {
+                    pool.submit(
+                        _zoom_3d,
+                        getattr(self, key) if ch is None else getattr(self, key)[..., ch],
+                        0 if np.issubdtype(getattr(self, key).dtype, np.integer) else 1,
+                    ): (key, ch)
+                    for key, ch in tasks
+                }
+
+                for future in as_completed(future_to_task):
+                    key, ch = future_to_task[future]
+                    zoomed = future.result()
+                    if ch is None:
+                        setattr(self, key, self._to_memmap(key, zoomed))
+                        del zoomed
+                        gc.collect()
+                    else:
+                        channel_buf[key][ch] = zoomed
+                        n_ch = getattr(self, key).shape[-1]
+                        if len(channel_buf[key]) == n_ch:
+                            stacked = np.stack(
+                                [channel_buf[key][c] for c in range(n_ch)], axis=-1
+                            )
+                            setattr(self, key, self._to_memmap(key, stacked))
+                            del stacked, channel_buf[key]
+                            gc.collect()
 
         self.voxel_size /= factor
         self.shape = self.GIDvol.shape
 
-    def pad(self, target_shape: tuple[int, int, int]) -> None:
-        """Centre-pad all 3-D volumes in-place to *target_shape*.
+    def pad(self, target_shape: tuple[int, int, int], keys: list[str] | None = None) -> None:
+        """Centre-pad 3-D volumes in-place to *target_shape*.
 
         Parameters
         ----------
         target_shape:
             Desired ``(nx, ny, nz)`` shape, typically the shape of the
             reference PCT volume.
+        keys:
+            Subset of field names to pad. ``None`` (default) processes all
+            fields.
         """
         pad_width = self._calculate_pad_width(target_shape)
+        keys_to_pad = self._vol_keys if keys is None else [k for k in keys if k in self._vol_keys]
 
-        for key in self._vol_keys:
+        for key in keys_to_pad:
             arr: np.ndarray = getattr(self, key)
             if arr.ndim == 3:
                 pw = pad_width
