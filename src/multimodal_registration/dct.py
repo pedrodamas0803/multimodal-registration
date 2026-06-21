@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import gc
+import json
 import os
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import h5py
@@ -27,7 +29,9 @@ class DCT:
 
     def __init__(self, dct_ds_path: str):
         self._vol_keys: list[str] = []
+        self._attr_keys: list[str] = []
         self._tmpdir = tempfile.TemporaryDirectory()
+        self._workdir: str = self._tmpdir.name
 
         with h5py.File(dct_ds_path, "r") as hin:
             for key in hin["DS"].keys():
@@ -38,9 +42,92 @@ class DCT:
                     self._vol_keys.append(key)
                 else:
                     setattr(self, key, data)
+                    self._attr_keys.append(key)
 
         self.shape: tuple[int, ...] = self.GIDvol.shape
         self.voxel_size: float = float(self.VoxSize[0, 0])
+
+    # ------------------------------------------------------------------
+    # Persistence
+    # ------------------------------------------------------------------
+
+    def save(self, directory: str) -> None:
+        """Persist the current state to *directory*.
+
+        All volume fields are written as raw binary files and a ``meta.json``
+        records shapes, dtypes, and scalar attributes.  Restore with
+        :meth:`from_cache`.
+
+        Parameters
+        ----------
+        directory:
+            Destination directory (created if it does not exist).
+        """
+        os.makedirs(directory, exist_ok=True)
+
+        meta: dict = {
+            "voxel_size": self.voxel_size,
+            "shape": list(self.shape),
+            "vol_keys": self._vol_keys,
+            "attr_keys": self._attr_keys,
+            "fields": {},
+        }
+
+        for key in self._vol_keys:
+            arr = getattr(self, key)
+            meta["fields"][key] = {"dtype": arr.dtype.str, "shape": list(arr.shape)}
+            dst = os.path.join(directory, f"{key}.dat")
+            if hasattr(arr, "filename") and os.path.abspath(arr.filename) == os.path.abspath(dst):
+                arr.flush()
+            else:
+                mm = np.memmap(dst, dtype=arr.dtype, mode="w+", shape=arr.shape)
+                mm[:] = arr
+                mm.flush()
+
+        attrs = {k: getattr(self, k) for k in self._attr_keys}
+        if attrs:
+            np.savez(os.path.join(directory, "attrs.npz"), **attrs)
+
+        with open(os.path.join(directory, "meta.json"), "w") as f:
+            json.dump(meta, f)
+
+    @classmethod
+    def from_cache(cls, directory: str) -> DCT:
+        """Restore a :class:`DCT` from a directory written by :meth:`save`.
+
+        The saved directory becomes the working directory, so subsequent
+        operations (pad, shift) update the files in-place.
+
+        Parameters
+        ----------
+        directory:
+            Directory previously written by :meth:`save`.
+        """
+        with open(os.path.join(directory, "meta.json")) as f:
+            meta = json.load(f)
+
+        obj: DCT = object.__new__(cls)
+        obj._tmpdir = None          # directory is user-managed
+        obj._workdir = directory
+        obj._vol_keys = meta["vol_keys"]
+        obj._attr_keys = meta.get("attr_keys", [])
+        obj.voxel_size = meta["voxel_size"]
+        obj.shape = tuple(meta["shape"])
+
+        for key in obj._vol_keys:
+            info = meta["fields"][key]
+            dtype = np.dtype(info["dtype"])
+            shape = tuple(info["shape"])
+            path = os.path.join(directory, f"{key}.dat")
+            setattr(obj, key, np.memmap(path, dtype=dtype, mode="r+", shape=shape))
+
+        attrs_path = os.path.join(directory, "attrs.npz")
+        if os.path.exists(attrs_path):
+            saved = np.load(attrs_path, allow_pickle=True)
+            for k in obj._attr_keys:
+                setattr(obj, k, saved[k])
+
+        return obj
 
     # ------------------------------------------------------------------
     # Visualization
@@ -81,39 +168,57 @@ class DCT:
     # Volumetric operations
     # ------------------------------------------------------------------
 
-    def upscale(self, factor: float) -> None:
-        """Upscale all 3-D volumes in-place by *factor*.
+    def upscale(
+        self,
+        factor: float,
+        keys: list[str] | None = None,
+    ) -> None:
+        """Upscale 3-D volumes in-place by *factor*.
 
-        Integer arrays (grain IDs, masks) use nearest-neighbour
-        interpolation (``order=0``); float/RGB arrays use linear
-        interpolation (``order=1``).
+        Integer arrays (grain IDs, masks) use nearest-neighbour interpolation
+        (``order=0``); float/RGB arrays use linear interpolation (``order=1``).
 
         Parameters
         ----------
         factor:
             Zoom factor to apply along each spatial axis (e.g. 2.0 doubles
             the resolution). Typically ``dct.voxel_size / pct.voxel_size``.
+        keys:
+            Subset of field names to upscale. ``None`` (default) processes
+            all fields. Useful when some fields can be recomputed more cheaply
+            than zooming them.
         """
         nd = backends.ndimage()
+        keys_to_zoom = self._vol_keys if keys is None else [k for k in keys if k in self._vol_keys]
 
-        for key in self._vol_keys:
+        def _zoom_key(key: str) -> None:
             arr: np.ndarray = getattr(self, key)
             order = 0 if np.issubdtype(arr.dtype, np.integer) else 1
-
             if arr.ndim == 3:
-                zoom_factors = [factor, factor, factor]
+                zf = [factor, factor, factor]
             elif arr.ndim == 4:
                 # Last axis is a channel (e.g. RGB colour) — do not zoom it.
-                zoom_factors = [factor, factor, factor, 1.0]
+                zf = [factor, factor, factor, 1.0]
             else:
-                continue
-
+                return
             d_arr = backends.to_device(arr.astype(float) if order > 0 else arr)
-            zoomed = backends.to_numpy(nd.zoom(d_arr, zoom_factors, order=order))
+            zoomed = backends.to_numpy(nd.zoom(d_arr, zf, order=order))
             del d_arr
             setattr(self, key, self._to_memmap(key, zoomed))
             del zoomed
             gc.collect()
+
+        if backends.backend_name() == "cuda":
+            # GPU already parallelises within each kernel; keep sequential to
+            # avoid multi-thread CuPy stream conflicts.
+            for key in keys_to_zoom:
+                _zoom_key(key)
+        else:
+            # scipy.ndimage.zoom releases the GIL — threads give real CPU
+            # parallelism. Cap workers to avoid excessive peak RAM usage.
+            n_workers = min(len(keys_to_zoom), os.cpu_count() or 1, 4)
+            with ThreadPoolExecutor(max_workers=n_workers) as pool:
+                list(pool.map(_zoom_key, keys_to_zoom))
 
         self.voxel_size /= factor
         self.shape = self.GIDvol.shape
@@ -146,7 +251,7 @@ class DCT:
             data = np.array(arr)
             del arr
 
-            path = os.path.join(self._tmpdir.name, f"{key}.dat")
+            path = os.path.join(self._workdir, f"{key}.dat")
             mm = np.memmap(path, dtype=data.dtype, mode="w+", shape=padded_shape)
             slices = tuple(slice(b, b + s) for (b, _), s in zip(pw, data.shape))
             mm[slices] = data
@@ -223,13 +328,8 @@ class DCT:
         return tuple(pad_width)
 
     def _to_memmap(self, key: str, arr: np.ndarray) -> np.memmap:
-        """Write *arr* to a per-key memory-mapped file and return the memmap.
-
-        The backing file lives in a temporary directory for the lifetime of
-        this object, so all 3-D volumes are paged by the OS rather than held
-        entirely in Python-managed RAM.
-        """
-        path = os.path.join(self._tmpdir.name, f"{key}.dat")
+        """Write *arr* to a per-key memory-mapped file and return the memmap."""
+        path = os.path.join(self._workdir, f"{key}.dat")
         mm = np.memmap(path, dtype=arr.dtype, mode="w+", shape=arr.shape)
         mm[:] = arr
         mm.flush()
